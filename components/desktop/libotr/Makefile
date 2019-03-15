@@ -20,14 +20,15 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
+
 BUILD_BITS= 64_and_32
 include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		libotr
 COMPONENT_VERSION=	4.1.1
-COMPONENT_PROJECT_URL=	http://www.cypherpunks.ca/otr/
+COMPONENT_PROJECT_URL=	https://otr.cypherpunks.ca/
 COMPONENT_ARCHIVE_HASH= \
     sha256:8b3b182424251067a952fb4e6c7b95a21e644fbb27fbd5f8af2b2ed87ca419f5
 COMPONENT_ARCHIVE_URL=	$(COMPONENT_PROJECT_URL)$(COMPONENT_ARCHIVE)
@@ -35,14 +36,6 @@ COMPONENT_BUGDB=	utility/pidgin
 COMPONENT_ANITYA_ID=	13303
 
 TPNO=			27468
-
-# Pidgin is on the do-not-publish list (depends on S12-only changes in ON &
-# Desktop), so no point publishing this without that.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_32_and_64=
-INSTALL_32_and_64=
-PUBLISH_STAMP=
-endif
 
 TEST_TARGET= $(NO_TESTS)
 include $(WS_MAKE_RULES)/common.mk

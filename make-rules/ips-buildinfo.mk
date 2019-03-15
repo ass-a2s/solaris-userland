@@ -42,7 +42,7 @@
 # The Solaris Update number. This will be set by the gatekeepers.
 # The value must match the update number of the release.
 #
-UPDATENUM ?= 4
+UPDATENUM ?= 5
 
 # Target OS version
 PKG_SOLARIS_VERSION ?= 11.$(UPDATENUM)
@@ -58,7 +58,7 @@ SRUNUM ?= 0
 # For distinguising between Server OS and Storage OS branches, and/or between
 # trunk and release branches.
 #
-BRANCH_ORDER ?= 1
+BRANCH_ORDER ?= 0
 
 #
 # Platform number. This is here to reserve space within the version
@@ -72,7 +72,7 @@ PLATNUM ?= 0
 # the development build) of the Solaris Update is being built.
 # This is set by the gatekeepers.
 #
-BUILDID ?= 16
+BUILDID ?= 42
 
 # Each (nightly) build of the code that produces packages needs to
 # be uniquely identified so that packages produced by different
@@ -103,8 +103,4 @@ BUILD_VERSION ?=  5.11-$(BRANCHID)
 
 # Set a default reference repository against which pkglint is run, in case it
 # hasn't been set in the environment.
-ifeq ($(BUILD_TYPE),evaluation)
-CANONICAL_REPO ?=		http://ipkg.us.oracle.com/solaris11/release/
-else
 CANONICAL_REPO ?=		http://ipkg.us.oracle.com/solaris11/dev/
-endif

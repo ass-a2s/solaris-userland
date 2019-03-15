@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2011, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 BUILD_BITS= 64
 include ../../make-rules/shared-macros.mk
@@ -40,13 +40,8 @@ TPNO=			36055
 # We just need to build one version.
 PYTHON_VERSIONS =       3.5
 
-ifneq ($(BUILD_TYPE), evaluation)
 BUILD_STYLE= setup.py
-endif
 TEST_TARGET=	$(TEST_64)
-
-# Needs older version of libpng, no longer available in evaluation builds.
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/common.mk
 
@@ -57,6 +52,11 @@ PYTHON_VERSION =	3.5
 PKG_MACROS +=		PYVER=$(PYTHON_VERSION)
 
 PYTHON_DATA =		/usr
+
+# Don't build and package these, they need to be generated on install to
+# reflect all the other packages installed on the machine too, not just meld
+COMPONENT_SETUP_ARGS += --no-compile-schemas
+COMPONENT_SETUP_ARGS += --no-update-icon-cache
 
 COMPONENT_TEST_DIR =    $(COMPONENT_SRC)/test
 COMPONENT_TEST_ENV =	PYTHONPATH=$(PROTO_DIR)/$(PYTHON_LIB)
@@ -71,9 +71,10 @@ COMPONENT_TEST_TRANSFORMS += \
 ASLR_MODE = $(ASLR_NOT_APPLICABLE)
 
 REQUIRED_PACKAGES += developer/intltool
+REQUIRED_PACKAGES += gnome/gsettings-desktop-schemas
 REQUIRED_PACKAGES += library/desktop/gtksourceview3
 REQUIRED_PACKAGES += library/gnome/gnome-common
-REQUIRED_PACKAGES += library/python/pycairo-27
+REQUIRED_PACKAGES += library/python/pycairo-35
 REQUIRED_PACKAGES += library/python/tkinter-35
 REQUIRED_PACKAGES += runtime/python-35
 REQUIRED_PACKAGES += text/gnu-gettext

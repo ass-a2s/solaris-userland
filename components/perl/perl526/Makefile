@@ -20,24 +20,24 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		perl
-COMPONENT_VERSION=	5.26.1
+COMPONENT_VERSION=	5.26.3
 PERL_VERSION_LOCAL=	5.26
 COMPONENT_PROJECT_URL=	http://www.perl.org/
 COMPONENT_SRC=		$(COMPONENT_NAME)-$(COMPONENT_VERSION)
 COMPONENT_ARCHIVE=	$(COMPONENT_SRC).tar.bz2
 COMPONENT_ARCHIVE_HASH=	\
-     sha256:da1e412460263be73fc3b16b5dd8d53ce9c01c9d2e5ede6fe6c267ed1ecaf505
+     sha256:9ff35a613213f29ab53975141af6825ae7d4408895538cac0922e47ab92a1477
 COMPONENT_ARCHIVE_URL=	http://www.cpan.org/src/5.0/$(COMPONENT_ARCHIVE)
 COMPONENT_BUGDB=	utility/perl
 COMPONENT_ANITYA_ID=	13599
 
-TPNO=			39360
+TPNO=			47761
 
 include $(WS_MAKE_RULES)/prep.mk
 include $(WS_MAKE_RULES)/configure.mk
@@ -141,6 +141,12 @@ COMPONENT_TEST_TRANSFORMS += \
 #
 PKG_MACROS 		+=	P_ARCH=$(shell arch)
 PKG_MACROS		+=	PERL_VERSION=$(PERL_VERSION_LOCAL)
+
+# Force a deterministic choice of which is the file & which is the hardlink,
+# otherwise it may vary between runs of pkgsend generate / manifest-check
+PKG_HARDLINKS += usr/perl5/$(PERL_VERSION_LOCAL)/bin/perl$(COMPONENT_VERSION)
+PKG_HARDLINKS += usr/perl5/$(PERL_VERSION_LOCAL)/bin/perlbug
+PKG_HARDLINKS += usr/perl5/$(PERL_VERSION_LOCAL)/man/man1/perlthanks.1
 
 configure:	$(CONFIGURE_64)
 

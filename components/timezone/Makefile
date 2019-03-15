@@ -27,20 +27,15 @@ BUILD_BITS= NO_ARCH
 include ../../make-rules/shared-macros.mk
 
 COMPONENT_NAME= 	timezone
-COMPONENT_VERSION=    	2017.1
+COMPONENT_VERSION=    	2018.6.1
+COMPONENT_PROJECT_URL=	http://www.iana.org/time-zones
 COMPONENT_SRC=
 COMPONENT_ARCHIVE_SRC=	none
-HUMAN_VERSION=		2017a
-TPNO=			24870
+HUMAN_VERSION=		2018f
+TPNO=			46810
 COMPONENT_ANITYA_ID=	5021
 
-# Build info part of pkg(5) FMRI dropped ",$(OS_RELEASE)" between 11 and 12;
-# needed for evaluation repo where we build the default repo from 12 on 11.
-ifeq ($(OS_VERSION),11.3)
-OS_META_VERSION=	,$(OS_RELEASE)-$(OS_RELEASE)
-else
 OS_META_VERSION=	-$(PKG_SOLARIS_VERSION)
-endif
 
 # "etcetera" must be listed before "backward" because it sets up links that
 # "backward" needs.
@@ -56,22 +51,12 @@ PKG_MACROS +=		OS_META_VERSION=$(OS_META_VERSION)
 
 POFILE=zoneinfo.po
 
-CLEAN_PATHS += $(POFILE) $(LINGUAS:%=%.mo)
+CLEAN_PATHS += $(POFILE)
 
-LINGUAS = de_DE es_ES fr_FR it_IT ja_JP ko_KR pt_BR zh_CN zh_TW
-
-%.mo: po/%.po
-	/usr/bin/gmsgfmt -o $@.tmp $<
-	$(MV) $@.tmp $@
-
-$(PROTOUSRLIBDIR)/locale/%.UTF-8/LC_MESSAGES/SUNW_OST_ZONEINFO.mo: %.mo
-	$(MKDIR) -p $(@D)
-	$(CP) $< $@
-
-build: $(LINGUAS:%=%.mo)
+build:
 	@/bin/sh ./do_pofile.sh | /usr/bin/msguniq > $(POFILE)
 
-install: build $(LINGUAS:%=$(PROTOUSRLIBDIR)/locale/%.UTF-8/LC_MESSAGES/SUNW_OST_ZONEINFO.mo)
+install: build
 	/usr/sbin/zic -d $(PROTOUSRSHARELIBDIR)/zoneinfo $(TZFILES)
 
 # empty test target

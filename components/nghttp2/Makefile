@@ -20,21 +20,21 @@
 #
 
 #
-# Copyright (c) 2016, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 BUILD_BITS= 64_and_32
 include ../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		nghttp2
-COMPONENT_VERSION=	1.27.0
+COMPONENT_VERSION=	1.35.0
 COMPONENT_PROJECT_URL=	https://nghttp2.org/
 COMPONENT_ARCHIVE_HASH= \
-    sha256:3d8fe1fe2ea8631343fb58c4d241e554758e0c56a7146118c130eae1c2312bc5
+    sha256:ea04e4e749df13d60a88b706752e04f6f907227bf380aefd7aeeb4aa0db43407
 COMPONENT_ARCHIVE_URL=	https://github.com/tatsuhiro-t/nghttp2/releases/download/v$(COMPONENT_VERSION)/$(COMPONENT_ARCHIVE)
 COMPONENT_BUGDB=	library/nghttp2
 COMPONENT_ANITYA_ID=	8651
 
-TPNO = 39147
+TPNO = 47754
 
 TEST_TARGET= $(NO_TESTS)
 include $(WS_MAKE_RULES)/common.mk

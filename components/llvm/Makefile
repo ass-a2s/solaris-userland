@@ -28,20 +28,9 @@ COMPILER=gcc
 
 include ../../make-rules/shared-macros.mk
 
-# This and intel-openmp must use the same version of gcc.  In addition, LLVM's
-# gcc toolchain logic we currently have for Solaris is effectively hard-coded
-# for a specific version of gcc (5.5.0 currently):
-#
-# 25682681 llvm's gcc toolchain usage should be multilib friendly and
-#          version-agnostic
-#
-# Changing to a different version of gcc currently requires an update to
-# patches/012-solaris-clang-libclangDriver.patch.
-GCC_ROOT=/usr/gcc/5
-
 COMPONENT_NAME=		llvm
-COMPONENT_VERSION=	3.8.1
-COMPONENT_PROJECT_URL=	http://llvm.org/
+COMPONENT_VERSION=	6.0.1
+COMPONENT_PROJECT_URL=	https://llvm.org/
 COMPONENT_SRC=		$(COMPONENT_NAME)
 COMPONENT_BUGDB=	utility/llvm
 
@@ -49,18 +38,20 @@ COMPONENT_SRC=		$(COMPONENT_NAME)-$(COMPONENT_VERSION)
 COMPONENT_SRC_NAME=	$(COMPONENT_SRC).src
 COMPONENT_ARCHIVE=	$(COMPONENT_SRC_NAME).tar.xz
 COMPONENT_ARCHIVE_HASH=	\
-    sha256:6e82ce4adb54ff3afc18053d6981b6aed1406751b8742582ed50f04b5ab475f9
+    sha256:b6d6c324f9c71494c0ccaf3dac1f16236d970002b42bb24a6c9e1634f7d0f4e2
 COMPONENT_ARCHIVE_URL=	$(COMPONENT_PROJECT_URL)/releases/$(COMPONENT_VERSION)/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).sig
 COMPONENT_ANITYA_ID=	1830
 
-TPNO=			28049
+TPNO=			45099
 
 COMPONENT_NAME_1 =	clang
 COMPONENT_SRC_1 =	cfe-$(COMPONENT_VERSION).src
 COMPONENT_ARCHIVE_1 =	$(COMPONENT_SRC_1).tar.xz
 COMPONENT_ARCHIVE_HASH_1 = \
-	sha256:4cd3836dfb4b88b597e075341cae86d61c63ce3963e45c7fe6a8bf59bb382cdf
+	sha256:7c243f1485bddfdfedada3cd402ff4792ea82362ff91fbdac2dae67c6026b667
 COMPONENT_ARCHIVE_URL_1 = $(COMPONENT_PROJECT_URL)/releases/$(COMPONENT_VERSION)/$(COMPONENT_ARCHIVE_1)
+COMPONENT_SIG_URL_1=	$(COMPONENT_ARCHIVE_URL_1).sig
 COMPONENT_ANITYA_ID_1=	11811
 
 COMPONENT_POST_UNPACK_ACTION = \
@@ -70,14 +61,6 @@ COMPONENT_POST_UNPACK_ACTION_1 = \
 	 ( $(RM) -rf $(COMPONENT_SRC)/tools/$(COMPONENT_NAME_1) ; \
 	 $(CP) -rp $(COMPONENT_SRC_1) \
 	    $(COMPONENT_SRC)/tools/$(COMPONENT_NAME_1) )
-
-# Depends on S12-only changes in gcc; might be able to deal with later,
-# but avoid publishing while this is under investigation.
-ifeq ($(BUILD_TYPE), evaluation)
-  BUILD_64=
-  INSTALL_64=
-  PUBLISH_STAMP=
-endif
 
 BUILD_STYLE = cmake
 # Building with debug info results in ~7GB of package data, so while preferred,
@@ -93,21 +76,6 @@ DEBUG_BUILD := 0
 HAVE_SPHINX := 0
 
 export PATH=/usr/gnu/bin:/usr/bin:/usr/perl5/$(PERL_VERSION)/bin
-
-# We're building with CMake
-CMAKE_VERSION := $(shell $(CMAKE) --version 2>&1 | head -n1 \
-  | $(GSED) 's/cmake version \{1,\}//g')
-CMAKE_MAJOR_VERSION := $(shell echo $(CMAKE_VERSION) | cut -f1 -d'.')
-CMAKE_MINOR_VERSION := $(shell echo $(CMAKE_VERSION) | cut -f2 -d'.')
-CMAKE_MICRO_VERSION := $(shell echo $(CMAKE_VERSION) | cut -f3 -d'.')
-
-# CMake prior to 3.6.0 does not define CMAKE_HOST_SOLARIS.
-# In that case, we pass it in CMAKE_OPTIONS.
-CMAKE_NEEDS_SOLARIS_HOST := 0
-ifeq ($(shell expr $(CMAKE_MAJOR_VERSION) \<= 3 \& \
-		    $(CMAKE_MINOR_VERSION) \<= 5),1)
-  CMAKE_NEEDS_SOLARIS_HOST = 1
-endif
 
 # We need the specific C++ runtime that clang/llvm was built and
 # linked with, and not some random and incompatible stuff from
@@ -143,16 +111,12 @@ LLVM_MAN_FILES=FileCheck.1 bugpoint.1 clang.1 lit.1 llc.1 lli.1 \
 
 COMPONENT_POST_BUILD_ACTION = \
       if test -d $(COMPONENT_DIR)/cxa_finalize ; then \
-      /usr/gnu/bin/touch $(COMPONENT_DIR)/cxa_finalize/.patched ; \
-      /usr/gnu/bin/touch $(COMPONENT_DIR)/cxa_finalize/.prep ; \
       $(GMAKE) -C $(COMPONENT_DIR)/cxa_finalize build ; \
-      /usr/gnu/bin/touch $(COMPONENT_DIR)/cxa_finalize/.built ; \
       fi
 
 COMPONENT_POST_INSTALL_ACTION = \
 	if test -d $(COMPONENT_DIR)/cxa_finalize ; then \
 	$(GMAKE) -C $(COMPONENT_DIR)/cxa_finalize install ; \
-	/usr/gnu/bin/touch $(COMPONENT_DIR)/cxa_finalize/.installed ; \
 	fi;
 
 COMPONENT_POST_INSTALL_ACTION += \
@@ -203,21 +167,21 @@ COMPONENT_POST_INSTALL_ACTION += \
 	  $(PROTOUSRLIBDIR)/clang/$(MACH64)/cxa_finalize_pic.o ;
 endif
 
+# Remove RPATH pointing to build area
+COMPONENT_POST_INSTALL_ACTION += \
+	for f in arcmt-test c-index-test c-arcmt-test diagtool llvm-lto; do \
+	$(ELFEDIT) -e "dyn:runpath $(LLVM_RUNPATH_64)" \
+	  $(PROTOUSRBINDIR)/$$f; done
+
 # Results output is slightly different on Intel vs. SPARC.
-# Not enabled just yet because of problems with the way opt
-# and FileCheck emit and parse the test case results.
 COMPONENT_TEST_MASTER = \
-	$(COMPONENT_TEST_RESULTS_DIR)/results-$(MACH).master
+	$(COMPONENT_TEST_RESULTS_DIR)/results-$(MACH64).master
 
 # Do not change the order of these regexp transforms.
 COMPONENT_TEST_TRANSFORMS += \
-    '-e "/gmake -f/d"' \
-    '-e "/gmake/d"' \
-    '-e "/--color=/d"' \
-    '-e "/Entering/d"' \
-    '-e "/Leaving/d"' \
-    '-e "/Built target/d"' \
-    '-e "/Nothing to be done/d"'
+    '-e "s/^Testing Time: .*$$/Test results:/" ' \
+    '-e "/^Test results:/,/Unexpected Failures:/p" ' \
+    '-e "/.*/d" '
 
 # -fstack-protector-all:
 # Enable stack smashing (stack corruption) protection and detection.
@@ -302,6 +266,7 @@ CXXFLAGS += -Wl,-z -Wl,relax=secadj
 CXXFLAGS += -Wl,-z -Wl,relax=transtls
 CXXFLAGS += -Wl,-z -Wl,relax=symbound
 CXXFLAGS += -Wl,-z -Wl,relax=comdat
+CXXFLAGS += -Wl,-z -Wl,gnu-version-script-compat
 CXXFLAGS += -Wl,-R -Wl,$(LLVM_RUNPATH)
 
 CPPFLAGS += -D_GNU_SOURCE -DLLVM_SOLARIS -I/usr/gnu/include
@@ -390,6 +355,9 @@ ifeq ($(HAVE_SPHINX),1)
   CMAKE_OPTIONS += -DSPHINX_OUTPUT_MAN:BOOL=ON
 endif
 
+# Enable FileCheck utility
+CMAKE_OPTIONS += -DLLVM_INSTALL_UTILS=ON
+
 # Always build the libLLVM and libclang shared libraries
 CMAKE_OPTIONS += -DLLVM_BUILD_LLVM_DYLIB:BOOL=ON
 CMAKE_OPTIONS += -DLLVM_LINK_LLVM_DYLIB:BOOL=ON
@@ -398,9 +366,7 @@ CMAKE_OPTIONS += -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
 
 CMAKE_OPTIONS += -DLLVM_COMPILER_IS_GCC_COMPATIBLE:BOOL=ON
 
-ifeq ($(CMAKE_NEEDS_SOLARIS_HOST),1)
-  CMAKE_OPTIONS += -DCMAKE_HOST_SOLARIS:BOOL=TRUE
-endif
+CMAKE_OPTIONS += -DLLVM_LIBDIR_SUFFIX="/$(MACH64)"
 
 COMPONENT_BUILD_ENV = CC="$(CC)"
 COMPONENT_BUILD_ENV += CXX="$(CXX)"
@@ -420,18 +386,15 @@ COMPONENT_BUILD_ARGS += -j8
 # fails
 COMPONENT_INSTALL_ARGS += SHELL=/bin/bash
 
-# There are no master test results just yet. But there will be
-# very soon.
-test:
-	@echo "Tests not yet implemented - coming soon in LLVM 3.8.1."
+clean::
+		cd cxa_finalize; gmake clean
+
+test:		$(TEST_64)
 
 system-test:    $(SYSTEM_TESTS_NOT_IMPLEMENTED)
 
 REQUIRED_PACKAGES += developer/build/cmake
 REQUIRED_PACKAGES += developer/build/pkg-config
-REQUIRED_PACKAGES += developer/gcc/gcc-c++-5
-REQUIRED_PACKAGES += developer/gcc/gcc-c-5
-REQUIRED_PACKAGES += developer/gcc/gcc-common-5
 REQUIRED_PACKAGES += developer/gnu-binutils
 REQUIRED_PACKAGES += library/libedit
 REQUIRED_PACKAGES += library/libffi
@@ -448,8 +411,8 @@ REQUIRED_PACKAGES += library/perl-5/xml-simple
 REQUIRED_PACKAGES += runtime/python-27
 REQUIRED_PACKAGES += system/core-os
 REQUIRED_PACKAGES += system/header
-REQUIRED_PACKAGES += system/library/gcc/gcc-runtime-5
-REQUIRED_PACKAGES += system/library/gcc/gcc-c++-runtime-5
-REQUIRED_PACKAGES += system/library/gcc/gcc-c-runtime-5
-REQUIRED_PACKAGES += system/library/gcc/gcc-gobjc-runtime-5
+REQUIRED_PACKAGES += system/library/gcc/gcc-runtime-7
+REQUIRED_PACKAGES += system/library/gcc/gcc-c++-runtime-7
+REQUIRED_PACKAGES += system/library/gcc/gcc-c-runtime-7
+REQUIRED_PACKAGES += system/library/gcc/gcc-gobjc-runtime-7
 REQUIRED_PACKAGES += system/library/math

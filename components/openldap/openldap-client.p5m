@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2011, 2016, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 <transform file path=usr.*/man/.+ -> default mangler.man.stability "pass-through uncommitted">
@@ -35,6 +35,7 @@ set name=pkg.fmri \
 set name=pkg.summary value=OpenLDAP
 set name=pkg.description \
     value="OpenLDAP is an open source implementation of the Lightweight Directory Access Protocol. This package contains the libraries implementing the LDAP protocol and tools."
+set name=pkg.human-version value=$(HUMAN_VERSION)
 set name=com.oracle.info.description value=OpenLDAP
 set name=com.oracle.info.tpno value=$(TPNO)
 set name=info.classification \
@@ -59,7 +60,7 @@ link path=usr/bin/ldapwhoami target=openldapwhoami
 link path=usr/bin/openldapadd target=openldapmodify
 # The bypasses (and manual dependency on libsasl at the end of the file)
 # are required for building with the cyrus-sasl proto area because of
-# libsasl version depency checks in openldap code.
+# libsasl version dependency checks in openldap code.
 file usr/bin/ldapcompare path=usr/bin/openldapcompare \
     pkg.depend.bypass-generate=libsasl2.so.3
 file usr/bin/ldapdelete path=usr/bin/openldapdelete \
@@ -93,33 +94,50 @@ file path=usr/include/openldap/ldap_features.h
 file path=usr/include/openldap/ldap_schema.h
 file path=usr/include/openldap/ldap_utf8.h
 file path=usr/include/openldap/ldif.h
-link path=usr/lib/$(MACH64)/liblber-2.4.so target=liblber-2.4.so.2.10.7
-link path=usr/lib/$(MACH64)/liblber-2.4.so.2 target=liblber-2.4.so.2.10.7
-file path=usr/lib/$(MACH64)/liblber-2.4.so.2.10.7
-link path=usr/lib/$(MACH64)/liblber.so target=liblber-2.4.so.2.10.7
-link path=usr/lib/$(MACH64)/libldap-2.4.so target=libldap-2.4.so.2.10.7
-link path=usr/lib/$(MACH64)/libldap-2.4.so.2 target=libldap-2.4.so.2.10.7
-file path=usr/lib/$(MACH64)/libldap-2.4.so.2.10.7 \
+link path=usr/lib/$(MACH64)/liblber-2.4.so target=liblber-2.4.so.2.10.9
+link path=usr/lib/$(MACH64)/liblber-2.4.so.2 target=liblber-2.4.so.2.10.9
+file path=usr/lib/$(MACH64)/liblber-2.4.so.2.10.9
+link path=usr/lib/$(MACH64)/liblber.so target=liblber-2.4.so.2.10.9
+link path=usr/lib/$(MACH64)/libldap-2.4.so target=libldap_r-2.4.so.2.10.9
+link path=usr/lib/$(MACH64)/libldap-2.4.so.2 target=libldap_r-2.4.so.2.10.9
+link path=usr/lib/$(MACH64)/libldap-2.4.so.2.10.9 target=libldap_r-2.4.so.2.10.9
+link path=usr/lib/$(MACH64)/libldap.so target=libldap_r-2.4.so.2.10.9
+link path=usr/lib/$(MACH64)/libldap_r-2.4.so target=libldap_r-2.4.so.2.10.9
+link path=usr/lib/$(MACH64)/libldap_r-2.4.so.2 target=libldap_r-2.4.so.2.10.9
+file path=usr/lib/$(MACH64)/libldap_r-2.4.so.2.10.9 \
     pkg.depend.bypass-generate=libsasl2.so.3
-link path=usr/lib/$(MACH64)/libldap.so target=libldap_r-2.4.so.2.10.7
-link path=usr/lib/$(MACH64)/libldap_r-2.4.so target=libldap_r-2.4.so.2.10.7
-link path=usr/lib/$(MACH64)/libldap_r-2.4.so.2 target=libldap_r-2.4.so.2.10.7
-file path=usr/lib/$(MACH64)/libldap_r-2.4.so.2.10.7 \
+link path=usr/lib/$(MACH64)/libldap_r.so target=libldap_r-2.4.so.2.10.9
+file path=usr/lib/$(MACH64)/llib-llber-2.4.ln
+link path=usr/lib/$(MACH64)/llib-llber.ln target=llib-llber-2.4.ln
+link path=usr/lib/$(MACH64)/llib-lldap-2.4.ln target=llib-lldap_r-2.4.ln
+link path=usr/lib/$(MACH64)/llib-lldap.ln target=llib-lldap_r-2.4.ln
+file path=usr/lib/$(MACH64)/llib-lldap_r-2.4.ln
+link path=usr/lib/$(MACH64)/llib-lldap_r.ln target=llib-lldap_r-2.4.ln
+link path=usr/lib/liblber-2.4.so target=liblber-2.4.so.2.10.9
+link path=usr/lib/liblber-2.4.so.2 target=liblber-2.4.so.2.10.9
+file path=usr/lib/liblber-2.4.so.2.10.9
+link path=usr/lib/liblber.so target=liblber-2.4.so.2.10.9
+link path=usr/lib/libldap-2.4.so target=libldap_r-2.4.so.2.10.9
+link path=usr/lib/libldap-2.4.so.2 target=libldap_r-2.4.so.2.10.9
+link path=usr/lib/libldap-2.4.so.2.10.9 target=libldap_r-2.4.so.2.10.9
+link path=usr/lib/libldap.so target=libldap_r-2.4.so.2.10.9
+link path=usr/lib/libldap_r-2.4.so target=libldap_r-2.4.so.2.10.9
+link path=usr/lib/libldap_r-2.4.so.2 target=libldap_r-2.4.so.2.10.9
+file path=usr/lib/libldap_r-2.4.so.2.10.9 \
     pkg.depend.bypass-generate=libsasl2.so.3
-link path=usr/lib/$(MACH64)/libldap_r.so target=libldap_r-2.4.so.2.10.7
-link path=usr/lib/liblber-2.4.so target=liblber-2.4.so.2.10.7
-link path=usr/lib/liblber-2.4.so.2 target=liblber-2.4.so.2.10.7
-file path=usr/lib/liblber-2.4.so.2.10.7
-link path=usr/lib/liblber.so target=liblber-2.4.so.2.10.7
-link path=usr/lib/libldap-2.4.so target=libldap-2.4.so.2.10.7
-link path=usr/lib/libldap-2.4.so.2 target=libldap-2.4.so.2.10.7
-file path=usr/lib/libldap-2.4.so.2.10.7 pkg.depend.bypass-generate=libsasl2.so.3
-link path=usr/lib/libldap.so target=libldap_r-2.4.so.2.10.7
-link path=usr/lib/libldap_r-2.4.so target=libldap_r-2.4.so.2.10.7
-link path=usr/lib/libldap_r-2.4.so.2 target=libldap_r-2.4.so.2.10.7
-file path=usr/lib/libldap_r-2.4.so.2.10.7 \
-    pkg.depend.bypass-generate=libsasl2.so.3
-link path=usr/lib/libldap_r.so target=libldap_r-2.4.so.2.10.7
+link path=usr/lib/libldap_r.so target=libldap_r-2.4.so.2.10.9
+link path=usr/lib/llib-llber target=llib-llber-2.4
+file path=usr/lib/llib-llber-2.4
+file path=usr/lib/llib-llber-2.4.ln
+link path=usr/lib/llib-llber.ln target=llib-llber-2.4.ln
+link path=usr/lib/llib-lldap target=llib-lldap_r-2.4
+link path=usr/lib/llib-lldap-2.4 target=llib-lldap_r-2.4
+link path=usr/lib/llib-lldap-2.4.ln target=llib-lldap_r-2.4.ln
+link path=usr/lib/llib-lldap.ln target=llib-lldap_r-2.4.ln
+link path=usr/lib/llib-lldap_r target=llib-lldap_r-2.4
+file path=usr/lib/llib-lldap_r-2.4
+file path=usr/lib/llib-lldap_r-2.4.ln
+link path=usr/lib/llib-lldap_r.ln target=llib-lldap_r-2.4.ln
 link path=usr/lib/openldap/bin/ldapadd target=../../../bin/openldapmodify
 link path=usr/lib/openldap/bin/ldapcompare target=../../../bin/openldapcompare
 link path=usr/lib/openldap/bin/ldapdelete target=../../../bin/openldapdelete

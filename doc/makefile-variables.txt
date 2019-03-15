@@ -18,7 +18,9 @@ have defaults, but can be overridden.
 * COMPONENT_VERSION is typically numbers separated by dots (e.g. 7.3).
 
 * COMPONENT_SRC is where the archive is extracted; it has a default value of
-  "$(COMPONENT_NAME)-$(COMPONENT_VERSION)".
+  "$(COMPONENT_NAME)-$(COMPONENT_VERSION)". One component can be constructed
+  out of multiple soruce archives, that is discussed later in the section
+  "Multiple source archives for one component"
 
 * COMPONENT_PROJECT_URL is the general web site for the component.
 
@@ -41,7 +43,9 @@ have defaults, but can be overridden.
 
 * COMPONENT_ANITYA_ID is the project id for this software at
   https://release-monitoring.org which is used to track when a new version
-  is available.
+  is available.  "N/A" specifies there is either no external upstream to
+  track, or that this instance should not be compared against upstream (such
+  as for the older versions of a component we ship multiple versions of).
 
 * COMPONENT_SIG_URL is the URL where the PGP signature for $(COMPONENT_ARCHIVE)
   can be found.  This can be used in addition to the hash in
@@ -75,7 +79,8 @@ have defaults, but can be overridden.
 * SVN_REV is the tag or changeset that you wish to pull from Subversion.
 
 * REQUIRED_PACKAGES is a list of packages required to build or run the
-  component and its tests; it includes "system/library" by default.
+  component and its tests; it includes "system/library" and
+  "system/library/libc" by default.
 
 The following are basic variables that must be set before including common.mk
 if overriding the default:
@@ -123,6 +128,19 @@ if overriding the default:
   every time you change REQUIRED_PACKAGES, you can do
   $ gmake MAKEFILE_PREREQ= publish
 
+* GENERATE_TRANSFORM list of pkgmogrify transforms applied during
+  'gmake sample-manifest' and 'gmake manifest-check' to pkgsend(1) generate
+  output. It does things like converting 'sparcv9|amd64' to '$(MACH64)', drops
+  certain directories known to be defined elsewhere (like /etc), removes
+  unnecessary attributes (like timestamp).
+
+* MANIFEST_CLEANUP_TRANSFORM list of common pkgmogrify transforms applied during
+  'gmake manifest-check'. By default this removes 'dir' actions (which we
+  normally do not have in manifests) and handles japan language incompatibility
+  between Linux and Solaris. It is similar to what GENERATE_TRANSFORM does (and
+  it is applied on top of this tranform) but for some corner cases it can do
+  too much, so keeping it in separate variable makes it possible to disable it.
+
 * PRIORITY_COMPONENTS is a variable which may be used on command line during
   full build. It says which components should be build before the rest of the
   components. There are two reasons one may wish to use this feature
@@ -134,6 +152,17 @@ if overriding the default:
     only during full build and do not want to wait till all previous components
     are built. This can be partially achieved by specifying COMPONENT_DIRS on
     command line, but that would mean only given component would be built.
+
+* SOLARIS_11_*_ONLY - variable limiting the rest of the line to only given
+  release allowing to use common source for multiple branches to ease
+  backporting. For example in the Makefile
+
+  $(SOLARIS_11_3_ONLY)REQUIRED_PACKAGES += library/openldap
+
+  The variable SOLARIS_11_3_ONLY is empty in 11.3, but contains comment mark '#'
+  in any other release. That way the line applies only when compiled in 11.3.
+  The variables are also defined in p5m manifests so the same principle can be
+  used there too. 
 
 The following variables alter the compilation or build process for components:
 
@@ -349,10 +378,16 @@ publication, the following variables are available:
   PYTHON_VERSIONS.  MAYBE_PYVER_SPACE (e.g. '2.7 ') and MAYBE_SPACE_PYVER
   (e.g. ' 2.7') are derived from PYVER if defined.  If PYVER is not defined
   (such as when a generic unversioned Python package manifest is being
-  created), these are defined as ''.  perl and ruby follow the same pattern
-  and define PERLVER, PERL_VERSIONS, MAYBE_SPACE_PERLVER, MAYBE_PERLVER_SPACE
-  and RUBY_VERSION, RUBY_VERSIONS, MAYBE_RUBY_VERSION_SPACE,
-  MAYBE_SPACE_RUBY_VERSION respectively.
+  created), these are defined as ''.
+
+* Variable PYTHON3_SOABI selects between two library naming schemes of
+  python3 extensions: *.cpython3Xm.so ("cpython") or *.abi3.so ("abi3").
+  Currently, only a few components use ABI3 compliant extensions,
+  therefore, the default value is set to "cpython".
+
+* Perl and ruby follow the same pattern as python and define PERLVER,
+  PERL_VERSIONS, MAYBE_SPACE_PERLVER, MAYBE_PERLVER_SPACE and RUBY_VERSION,
+  RUBY_VERSIONS, MAYBE_RUBY_VERSION_SPACE, MAYBE_SPACE_RUBY_VERSION respectively.
 
 * TPNO is the Third Party number (i.e., a numeric value): the License
   Technology from the Product Lifecycle Suite tool.  This should be used
@@ -382,7 +417,9 @@ publication, the following variables are available:
   this end-of-the-build-pkglint-everything-together step, which makes it much
   easier to "finish off" a build where a small number of components failed.
 
----
+
+Indirectly using variables
+==========================
 
 Now switching from explaining the function of specific variables to a more
 general discussion about how to use them to solve problems.  One method that
@@ -398,3 +435,40 @@ $(PYTHON3_VERSIONS) and $(PYTHON2_VERSIONS) which in turn were "3.4" and
 the problem, as it allowed $(PYTHON_VERSIONS) to be used to specify 64-bit
 macros but $(PYTHON2_VERSIONS) to specify 32-bit macros.  There are many
 other places where constructs like this are used.
+
+
+Multiple source archives for one component
+==========================================
+Userland provides set of tools to download, unpack and patch any archive. In
+order to utilize it one must define
+
+COMPONENT_SRC (== name of the directory where the archive is unpacked)
+COMPONENT_ARCHIVE (== name of the archive file itself)
+COMPONENT_ARCHIVE_URL (== where to obtain the archive)
+
+After unpacking COMPONENT_ARCHIVE all patches from patches/*.patch are applied
+in COMPONENT_SRC directory.
+
+If component needs second archive, just add second set of variables with common
+postfix. In this example it is "_lib"
+
+COMPONENT_SRC_lib
+COMPONENT_ARCHIVE_lib
+COMPONENT_ARCHIVE_URL_lib
+
+And similarly as before, after unpacking COMPONENT_ARCHIVE_lib all patches with
+the same postfix, thus form patches/*.patch_lib are applied in
+COMPONENT_SRC_lib directory.
+
+Please note that the variables are processed by "common.mk" so they have to be
+defined _before_ including "$(WS_MAKE_RULES)/common.mk"
+
+This is the minimum to add new archive. But there are more variables bound by
+the same postfix to given archive.
+
+SOURCE_DIR
+COMPONENT_ARCHIVE_HASH
+COMPONENT_ARCHIVE_SIG_URL
+COMPONENT_POST_UNPACK_ACTION
+GIT_REPO, GIT_BRANCH, GIT_COMMIT_ID, ...
+HG_TAG, HG_BRANCH, HG_REV, ...

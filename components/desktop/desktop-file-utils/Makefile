@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2016, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS=		64
@@ -29,20 +29,18 @@ include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		desktop-file-utils
 COMPONENT_VERSION=	0.23
-COMPONENT_PROJECT_URL=	http://freedesktop.org/wiki/Software/desktop-file-utils/
+COMPONENT_PROJECT_URL=	https://freedesktop.org/wiki/Software/desktop-file-utils/
 COMPONENT_ARCHIVE=      $(COMPONENT_SRC).tar.xz
 COMPONENT_ARCHIVE_HASH= \
     sha256:6c094031bdec46c9f621708f919084e1cb5294e2c5b1e4c883b3e70cb8903385
-COMPONENT_ARCHIVE_URL=	http://www.freedesktop.org/software/$(COMPONENT_NAME)/releases/$(COMPONENT_ARCHIVE)
+COMPONENT_ARCHIVE_URL=	https://www.freedesktop.org/software/$(COMPONENT_NAME)/releases/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_BUGDB=	gnome/menus
 COMPONENT_ANITYA_ID=	421
 
 TPNO=			37080
 
 TEST_TARGET = $(NO_TESTS)
-
-# Needs updated glib2, not available on S11.
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/common.mk
 

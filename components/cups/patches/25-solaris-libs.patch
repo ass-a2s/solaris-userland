@@ -1,0 +1,13 @@
+--- ppdc/Makefile	2018-12-06 09:27:31.454495891 +0100
++++ ppdc/Makefile	2018-12-06 09:27:17.478683377 +0100
+@@ -19,6 +19,9 @@
+ 
+ include ../Makedefs
+ 
++# Make library self-contained.
++LINKCUPS += -lCrun -lm
++
+ #
+ # Object files...
+ #
+

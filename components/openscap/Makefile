@@ -19,8 +19,9 @@
 # CDDL HEADER END
 
 #
-# Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2019, Oracle and/or its affiliates. All rights reserved.
 #
+
 BUILD_BITS= 64
 COMPILER= gcc
 include ../../make-rules/shared-macros.mk
@@ -28,20 +29,12 @@ include ../../make-rules/shared-macros.mk
 COMPONENT_NAME=		openscap
 COMPONENT_VERSION=	1.2.9
 COMPONENT_PROJECT_URL=  http://www.open-scap.org
-COMPONENT_DOWNLOAD_URL= https://fedorahosted.org/releases/o/p/openscap
+COMPONENT_DOWNLOAD_URL= https://github.com/OpenSCAP/openscap/releases/download
 COMPONENT_ARCHIVE_HASH= sha256:20ae67ffabf90865fb2033d5c5e49bfb5fb485ffa6ff37910e8d7084c2236c74
-COMPONENT_ARCHIVE_URL=  $(COMPONENT_DOWNLOAD_URL)/$(COMPONENT_ARCHIVE)
-COMPONENT_ANITYA_ID=	4619
+COMPONENT_ARCHIVE_URL=  $(COMPONENT_DOWNLOAD_URL)/$(COMPONENT_VERSION)/$(COMPONENT_ARCHIVE)
+COMPONENT_ANITYA_ID=	15641
 
 TPNO =			28398
-
-# Requires newer version of system/management/rad/client/rad-c from ON,
-# available in S12 but not 11.3, so do not publish.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_64=
-INSTALL_64=
-PUBLISH_STAMP=
-endif
 
 CFLAGS+=		-std=c99
 CFLAGS+=		-DNDEBUG
@@ -116,9 +109,11 @@ REQUIRED_PACKAGES += library/pcre
 REQUIRED_PACKAGES += $(PERL_PKG)
 REQUIRED_PACKAGES += runtime/python-27
 REQUIRED_PACKAGES += security/compliance/openscap
+REQUIRED_PACKAGES += system/library/datalink
 REQUIRED_PACKAGES += system/library/gcc/gcc-c-runtime
 REQUIRED_PACKAGES += system/library/math
 REQUIRED_PACKAGES += system/library/security/libgcrypt
+REQUIRED_PACKAGES += system/library/smf
 REQUIRED_PACKAGES += system/library/libv12n
 REQUIRED_PACKAGES += system/management/rad
 REQUIRED_PACKAGES += system/management/rad/client/rad-c

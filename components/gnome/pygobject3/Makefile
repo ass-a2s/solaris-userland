@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2016, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 # gobject-introspection bindings are only built correctly for gtk when building
@@ -38,13 +38,6 @@ COMPONENT_BUGDB=	gnome/libraries
 COMPONENT_ANITYA_ID=	13158
 
 TPNO=			35809
-
-# Needs gobject-introspection >= 1.39.0, which is not available on S11.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_32_and_64=
-INSTALL_32_and_64=
-PUBLISH_STAMP=
-endif
 
 # replicated from $(WS_MAKE_RULES)/setup.py.mk since this uses configure.mk
 CONFIGURE_64 += $(PYTHON3_VERSIONS:%=$(BUILD_DIR)/$(MACH64)-%/.configured)
@@ -69,7 +62,10 @@ TEST_TARGET= $(SKIP_TEST)
 include $(WS_MAKE_RULES)/gnome-component.mk
 
 # Required due to patch to configure.ac.
-COMPONENT_PREP_ACTION += ( cd $(@D) ; NOCONFIGURE=1 $(CONFIG_SHELL) autogen.sh );
+# The TERM is required because autogen.sh calls /usr/bin/gnome-autogen.sh which
+# in turn calls `tput bold` which may fail if you have TERM unknown to the
+# current build machine.
+COMPONENT_PREP_ACTION += ( cd $(@D) ; TERM=vt100 NOCONFIGURE=1 $(CONFIG_SHELL) autogen.sh );
 
 # Needs -std=c99 at minimum for 'NAN', etc.
 CFLAGS += -std=c11

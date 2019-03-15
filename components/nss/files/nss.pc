@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib/mps
+includedir=/usr/include/mps
+
+Name: NSS
+Description: Network Security Services
+Version: %NSS_VERSION%
+Requires: nspr >= %NSPR_VERSION%
+Libs: -R${libdir} -L${libdir} -lnss3 -lsmime3 -lssl3 -lnssutil3
+Cflags: -I${includedir}
+

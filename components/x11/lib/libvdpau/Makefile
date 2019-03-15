@@ -31,6 +31,7 @@ COMPONENT_NAME=		libvdpau
 COMPONENT_VERSION=	1.1.1
 COMPONENT_PROJECT_URL=  http://freedesktop.org/wiki/Software/VDPAU/
 COMPONENT_ARCHIVE_URL=	http://people.freedesktop.org/~aplattner/vdpau/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).sig
 COMPONENT_ARCHIVE_HASH= \
 	sha256:857a01932609225b9a3a5bf222b85e39b55c08787d0ad427dbd9ec033d58d736
 COMPONENT_BUGDB=        x11/libraries
@@ -50,4 +51,6 @@ COMPONENT_TEST_TRANSFORMS += \
         '-e "/ERROR:/p" '
 COMPONENT_TEST_MASTER = $(COMPONENT_TEST_RESULTS_DIR)/results-all.master
 
+REQUIRED_PACKAGES += developer/documentation-tool/doxygen
+REQUIRED_PACKAGES += image/graphviz
 REQUIRED_PACKAGES += x11/library/libxext

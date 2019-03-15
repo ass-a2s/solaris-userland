@@ -20,8 +20,9 @@
 #
 
 #
-# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2018, Oracle and/or its affiliates. All rights reserved.
 #
+
 include ../../make-rules/shared-macros.mk
 
 LD_Z_IGNORE =
@@ -32,6 +33,7 @@ COMPONENT_SRC=
 
 COMPONENT_PROJECT_URL=	http://www.openfabrics.org/
 COMPONENT_BUGDB=	library/ofuv_lib
+COMPONENT_ANITYA_ID=	17225
 
 TPNO_IBUTILS=		24918   
 TPNO_INFINIBAND_DIAGS=	24917   
@@ -46,19 +48,8 @@ TPNO_LIBSDP=		5080
 TPNO_PERFTEST=		5081
 TPNO_RDS_TOOLS=		5092
 
-include libsif/libsif-macros.mk 
-
-PKG_MACROS +=  LIBSIF_COMPONENT_VERSION=$(LIBSIF_COMPONENT_VERSION)
-PKG_MACROS +=  LIBSIF_COMPONENT_ARCHIVE_URL=$(LIBSIF_COMPONENT_ARCHIVE_URL)
-
-# sensitive to kernel interface changes.
-ifeq ($(BUILD_TYPE), evaluation)
-PUBLISH_STAMP=
-SUBDIRS =
-else
 # for now, everything with a Makefile should be built
 SUBDIRS =	$(shell echo */Makefile | sed -e 's;/Makefile;;g')
-endif
 
 include ofed.mk
 include $(WS_MAKE_RULES)/ips.mk
@@ -110,7 +101,6 @@ libibmad:		libibumad
 opensm:			libibumad libibmad
 ibutils:		opensm
 infiniband-diags:	libibverbs opensm
-libsif: 		libibverbs
 
 FORCE:
 

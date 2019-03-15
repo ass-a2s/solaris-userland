@@ -20,21 +20,25 @@
 #
 
 #
-# Copyright (c) 2011, 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 BUILD_BITS= 64
+COMPILER= gcc
 include ../../make-rules/shared-macros.mk
 
+MAJOR_VERSION=2.6
+MICRO_VERSION=7
+
 COMPONENT_NAME=		wireshark
-COMPONENT_VERSION=	2.4.5
+COMPONENT_VERSION=	$(MAJOR_VERSION).$(MICRO_VERSION)
 COMPONENT_PROJECT_URL=	http://www.wireshark.org/
 COMPONENT_ARCHIVE=	$(COMPONENT_SRC).tar.xz
 COMPONENT_ARCHIVE_HASH=	\
-    sha256:b3b2ec29fba0f4a3a590438abe4054e56f19108d440fc2d61492db9d8ff16fd7
+    sha256:747b3e7a37414942959f76f198be49dcbcca936bda538c4408942ce71bfd2b71
 COMPONENT_ARCHIVE_URL=	$(COMPONENT_PROJECT_URL)download/src/all-versions/$(COMPONENT_ARCHIVE)
 COMPONENT_ANITYA_ID=	5137
 
-TPNO=			41364
+TPNO=			49802
 
 # Enable adiheap security extension
 ADIHEAP_MODE =	$(ADIHEAP_ENABLE)
@@ -44,20 +48,12 @@ ADISTACK_MODE =	$(ADISTACK_DISABLE)
 
 TEST_TARGET= $(NO_TESTS)
 
-# Depends on newer cairo, which cannot be updated in S11.
-include $(WS_MAKE_RULES)/no-evaluation.mk
-
 include $(WS_MAKE_RULES)/common.mk
 
-# Micro version for easy libraries packaging
-MICRO_VERSION:= $(shell echo $(COMPONENT_VERSION) | awk -F. '{ print $$3 }')
+PKG_MACROS+= MAJOR_VERSION=$(MAJOR_VERSION)
 PKG_MACROS+= MICRO_VERSION=$(MICRO_VERSION)
 
 PATCH_LEVEL=0
-
-# Look for gnutls-3 pkg-config & libraries before the defaults
-PKG_CONFIG_PATH.64 := $(PKG_CONFIG_PATH.64)/gnutls-3:$(PKG_CONFIG_PATH.64)
-LDFLAGS += -L$(USRLIBDIR64)/gnutls-3
 
 # Reported via bug 12923
 CFLAGS += -I/usr/include/kerberosv5
@@ -93,10 +89,10 @@ COMPONENT_POST_CONFIGURE_ACTION = \
 # During install libtool will relink libwireshark library so that it
 # requires libwiretap version from system and not from proto area.
 # This workaround is only needed when CBE contains older libwiretap.
-LIBWIRESHARK=$(PROTOUSRLIBDIR64)/libwireshark.so.9.1.$(MICRO_VERSION)
+LIBWIRESHARK=$(PROTOUSRLIBDIR64)/libwireshark.so.10.1.$(MICRO_VERSION)
 COMPONENT_POST_INSTALL_ACTION = \
 	(WTAP=`$(ELFEDIT) -e dyn:dump $(LIBWIRESHARK) | grep 'libwiretap' | awk '{print $$4}'` \
-	; $(ELFEDIT) -e "dyn:value -s -with-valstr $$WTAP libwiretap.so.7" $(LIBWIRESHARK) )
+	; $(ELFEDIT) -e "dyn:value -s -with-valstr $$WTAP libwiretap.so.8" $(LIBWIRESHARK) )
 
 REQUIRED_PACKAGES += developer/lexer/flex
 REQUIRED_PACKAGES += developer/parser/bison

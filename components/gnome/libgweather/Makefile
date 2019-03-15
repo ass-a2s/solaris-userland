@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            32_and_64
@@ -31,6 +31,7 @@ include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		libgweather
 COMPONENT_VERSION=	3.24.0
+COMPONENT_PROJECT_URL=	https://wiki.gnome.org/Projects/LibGWeather
 COMPONENT_ARCHIVE_HASH=	\
 	sha256:1089b932205085add19e5e1b63361c0cff1a2c46a67ab2dded6dd2ca87bdfa3d
 COMPONENT_ANITYA_ID=	13147
@@ -38,9 +39,6 @@ COMPONENT_ANITYA_ID=	13147
 TPNO=			34522
 
 TEST_TARGET= $(NO_TESTS)
-
-# Need gobject-introspection, not available on S11
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/gnome-component.mk
 
@@ -53,6 +51,7 @@ CONFIGURE_OPTIONS += --enable-shared
 # Required for other components.
 CONFIGURE_OPTIONS += --enable-vala
 CONFIGURE_OPTIONS += --with-pic
+CONFIGURE_OPTIONS += --with-zoneinfo-dir=/usr/share/lib/zoneinfo
 
 CONFIGURE_ENV += PATH="$(GNUBIN):$(PATH)"
 

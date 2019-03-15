@@ -38,6 +38,7 @@ TEST_TARGET = $(NO_TESTS)
 # Sun source mkcookie
 COMPONENT_NAME_1=       mkcookie
 COMPONENT_ARCHIVE_SRC_1=none
+COMPONENT_ANITYA_ID_1=	N/A
 
 TEST_TARGET = $(NO_TESTS)
 
@@ -81,6 +82,7 @@ $(BUILD_DIR_1)/.installed: $(BUILD_DIR_1)/.built
 
 include $(WS_MAKE_RULES)/x11-component.mk
 
+REQUIRED_PACKAGES += x11/header/x11-protocols
 REQUIRED_PACKAGES += x11/library/libx11
 REQUIRED_PACKAGES += x11/library/libxau
 REQUIRED_PACKAGES += x11/library/libxext

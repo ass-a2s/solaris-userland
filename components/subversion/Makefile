@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2011, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS=64_and_32
@@ -30,10 +30,11 @@ PATH=$(dir $(CC)):$(SPRO_VROOT)/bin:$(USRBINDIR):$(GNUBIN)
 
 COMPONENT_NAME=		subversion
 COMPONENT_VERSION=	1.9.7
-COMPONENT_PROJECT_URL=	http://subversion.apache.org/
+COMPONENT_PROJECT_URL=	https://subversion.apache.org/
 COMPONENT_ARCHIVE_HASH=	\
     sha256:c72a209c883e20245f14c4e644803f50ae83ae24652e385ff5e82300a0d06c3c
 COMPONENT_ARCHIVE_URL=	https://www.apache.org/dist/$(COMPONENT_NAME)/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_BUGDB=	utility/svn
 COMPONENT_ANITYA_ID=	4905
 
@@ -95,8 +96,8 @@ PERL_ARCH_22_i386 = i86pc-solaris-thread-multi-64
 PERL_ARCH_22_sparc = sun4-solaris-thread-multi-64
 PERL_ARCH_22 = $(PERL_ARCH_22_$(MACH))
 
-APR_VERSION = 1.5
-APR_UTIL_VERSION = 1.5
+APR_VERSION = 1.6
+APR_UTIL_VERSION = 1.6
 
 # Use the libraries just built plus the svn test harness library.
 LD_TEST_PATH_32 := \
@@ -221,8 +222,8 @@ COMPONENT_POST_INSTALL_ACTION += \
 REQUIRED_PACKAGES += database/sqlite-3
 REQUIRED_PACKAGES += developer/versioning/subversion
 REQUIRED_PACKAGES += developer/build/scons
-REQUIRED_PACKAGES += library/apr-15
-REQUIRED_PACKAGES += library/apr-util-15
+REQUIRED_PACKAGES += library/apr-16
+REQUIRED_PACKAGES += library/apr-util-16
 REQUIRED_PACKAGES += library/expat
 REQUIRED_PACKAGES += library/glib2
 REQUIRED_PACKAGES += library/libserf
@@ -230,5 +231,4 @@ REQUIRED_PACKAGES += library/zlib
 REQUIRED_PACKAGES += runtime/perl-522
 REQUIRED_PACKAGES += security/kerberos-5
 REQUIRED_PACKAGES += system/library/c++-runtime
-$(SOLARIS_11_3_ONLY)REQUIRED_PACKAGES += system/library/security/libsasl
 REQUIRED_PACKAGES += system/library/security/libsasl2

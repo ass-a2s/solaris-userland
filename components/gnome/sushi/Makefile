@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            64
@@ -41,9 +41,6 @@ TPNO=			34524
 
 TEST_TARGET = $(NO_TESTS)
 
-# Needs gobject-introspection, not available on S11.
-include $(WS_MAKE_RULES)/no-evaluation.mk
-
 include $(WS_MAKE_RULES)/gnome-component.mk
 
 # Although sushi is not written in C++, it does link against webkitgtk4 which
@@ -55,6 +52,12 @@ CONFIGURE_OPTIONS += --disable-static
 CONFIGURE_OPTIONS += --enable-shared
 CONFIGURE_OPTIONS += --with-pic
 CONFIGURE_OPTIONS += --libexecdir=$(USRLIBDIR)
+
+# Workaround the mozjs issue described in 24935318
+# without with sushi has issues described in 28062328
+LD_EXEC_OPTIONS += -M $(WS_COMPONENTS)/gnome/gjs/mapfile
+ADIHEAP_MODE = $(ADIHEAP_DISABLE)
+ADISTACK_MODE = $(ADISTACK_DISABLE)
 
 # Required due to patches.
 COMPONENT_PREP_ACTION += (cd $(@D); autoreconf -fiv);

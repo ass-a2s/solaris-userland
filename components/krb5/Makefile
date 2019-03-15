@@ -20,8 +20,9 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2019, Oracle and/or its affiliates. All rights reserved.
 #
+
 BUILD_BITS= 64_and_32
 include ../../make-rules/shared-macros.mk
 
@@ -30,7 +31,7 @@ COMPONENT_NAME=		Kerberos
 # Encoding rule for MINOR: MIT KerberosV5 x.y[.z] => MINOR $MAJOR.y
 # Encoding rule for MICRO: MIT KerberosV5 x.y[.z] => MICRO $MINOR[.z]
 COMPONENT_MAJOR=	1
-COMPONENT_MINOR=	$(COMPONENT_MAJOR).15
+COMPONENT_MINOR=	$(COMPONENT_MAJOR).16
 COMPONENT_MICRO=	$(COMPONENT_MINOR).1
 COMPONENT_ANITYA_ID=	13287
 
@@ -40,19 +41,13 @@ IPS_COMPONENT_VERSION=	$(COMPONENT_VERSION).0
 COMPONENT_PROJECT_URL=	http://web.mit.edu/kerberos/
 COMPONENT_SRC=		krb5-$(COMPONENT_VERSION)
 COMPONENT_ARCHIVE_HASH=	\
-	sha256:71b8073db274c6e2332d47db03fa58582f7b0e92514126388f018e849b2fbd66
+	sha256:214ffe394e3ad0c730564074ec44f1da119159d94281bbec541dc29168d21117
 COMPONENT_ARCHIVE_URL=	\
 	$(COMPONENT_PROJECT_URL)dist/krb5/$(COMPONENT_MINOR)/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_BUGDB=	utility/kerberos
 
-TPNO=		34136
-
-# Depends on S12-only header file in ON.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_32_and_64=
-INSTALL_32_and_64=
-PUBLISH_STAMP=
-endif
+TPNO=		43971
 
 include $(WS_MAKE_RULES)/common.mk
 
@@ -91,6 +86,7 @@ CPPFLAGS += -D__STDC_WANT_LIB_EXT1__
 # If you make changes to LDFLAGS, check krb5-config and 052-krb5-config.patch.
 LDFLAGS += -lc $(LD_Z_DEFS)
 
+CONFIGURE_ENV += DEFCCNAME="FILE:/tmp/volatile-user/%{uid}/krb5cc_%{uid}"
 CONFIGURE_ENV += DEFKTNAME="FILE:$(ETCDIR)/krb5/krb5.keytab"
 CONFIGURE_ENV += DEFCKTNAME="FILE:/var/user/%{username}/client.keytab"
 
@@ -100,12 +96,13 @@ CONFIGURE_OPTIONS += --localstatedir=/var
 CONFIGURE_OPTIONS.32 += --libexecdir=$(USRLIBDIR)
 CONFIGURE_OPTIONS.64 += --libexecdir=$(USRLIBDIR)/$(MACH64)
 CONFIGURE_OPTIONS += --includedir=$(USRINCDIR)/kerberosv5
-CONFIGURE_OPTIONS += --with-pkinit-crypto-impl=openssl
+CONFIGURE_OPTIONS += --with-tls-impl=openssl
 CONFIGURE_OPTIONS += --with-crypto-impl=ucrypto
 CONFIGURE_OPTIONS += --with-ldap
 CONFIGURE_OPTIONS += --with-prng-alg=os
 CONFIGURE_OPTIONS += --with-tcl=$(USRDIR)
 CONFIGURE_OPTIONS += --without-system-verto
+CONFIGURE_OPTIONS += --enable-pkinit
 # Documented as with-audit-plugin, but it's really enable-audit-plugin
 CONFIGURE_OPTIONS += --enable-audit-plugin=solaris
 
@@ -228,7 +225,14 @@ REQUIRED_PACKAGES += service/security/kerberos-5
 REQUIRED_PACKAGES += shell/ksh93
 REQUIRED_PACKAGES += system/core-os
 REQUIRED_PACKAGES += system/library/math
+REQUIRED_PACKAGES += system/library/pam-core
 REQUIRED_PACKAGES += system/library/security/crypto
 REQUIRED_PACKAGES += system/library/security/gss
 REQUIRED_PACKAGES += system/library/security/sasl/digestmd5
 REQUIRED_PACKAGES += system/network/ldap/openldap
+
+#
+# t_kdb.py tests require ldap tools (slapadd et. al.) in order to check
+# kerberos with LDAP. The ldap admin tools are found at /usr/sbin/ on Solaris.
+#
+export PATH := $(PATH):/usr/sbin

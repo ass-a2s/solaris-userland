@@ -23,6 +23,7 @@
 <transform link path=usr/lib/samba/$(MACH64)/libwbclient.so.0 -> drop>
 <transform file path=usr/lib/samba/$(MACH64)/libwbclient.so.0.14 -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/libCHARSET3-samba4.so -> drop>
+<transform file path=usr/lib/samba/private/$(MACH64)/libMESSAGING-SEND-samba4.so -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/libaddns-samba4.so -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/libasn1util-samba4.so -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/libauthkrb5-samba4.so -> drop>
@@ -31,6 +32,7 @@
 <transform file path=usr/lib/samba/private/$(MACH64)/libcli-nbt-samba4.so -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/libcli-smb-common-samba4.so -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/libcliauth-samba4.so -> drop>
+<transform file path=usr/lib/samba/private/$(MACH64)/libcommon-auth-samba4.so -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/libdbwrap-samba4.so -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/libdcerpc-samba-samba4.so -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/libflag-mapping-samba4.so -> drop>
@@ -41,7 +43,7 @@
 <transform file path=usr/lib/samba/private/$(MACH64)/libiov-buf-samba4.so -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/libkrb5samba-samba4.so -> drop>
 <transform link path=usr/lib/samba/private/$(MACH64)/libldb.so.1 -> drop>
-<transform file path=usr/lib/samba/private/$(MACH64)/libldb.so.1.2.2 -> drop>
+<transform file path=usr/lib/samba/private/$(MACH64)/libldb.so.1.4.3 -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/libldbsamba-samba4.so -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/liblibcli-lsa3-samba4.so -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/liblibsmb-samba4.so -> drop>
@@ -67,12 +69,12 @@
 <transform file path=usr/lib/samba/private/$(MACH64)/libsys-rw-samba4.so -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/libtalloc-report-samba4.so -> drop>
 <transform link path=usr/lib/samba/private/$(MACH64)/libtalloc.so.2 -> drop>
-<transform file path=usr/lib/samba/private/$(MACH64)/libtalloc.so.2.1.9 -> drop>
+<transform file path=usr/lib/samba/private/$(MACH64)/libtalloc.so.2.1.14 -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/libtdb-wrap-samba4.so -> drop>
 <transform link path=usr/lib/samba/private/$(MACH64)/libtdb.so.1 -> drop>
-<transform file path=usr/lib/samba/private/$(MACH64)/libtdb.so.1.3.14 -> drop>
+<transform file path=usr/lib/samba/private/$(MACH64)/libtdb.so.1.3.16 -> drop>
 <transform link path=usr/lib/samba/private/$(MACH64)/libtevent.so.0 -> drop>
-<transform file path=usr/lib/samba/private/$(MACH64)/libtevent.so.0.9.34 -> drop>
+<transform file path=usr/lib/samba/private/$(MACH64)/libtevent.so.0.9.37 -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/libtime-basic-samba4.so -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/libutil-cmdline-samba4.so -> drop>
 <transform file path=usr/lib/samba/private/$(MACH64)/libutil-reg-samba4.so -> drop>

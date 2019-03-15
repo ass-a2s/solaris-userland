@@ -18,7 +18,9 @@
 #
 # CDDL HEADER END
 #
-# Copyright (c) 2016, 2017, Oracle and/or its affiliates. All rights reserved.
+
+#
+# Copyright (c) 2016, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 # MySQL 5.7 is compiled using GCC. Note that the MySQL Server 5.7 for
@@ -31,25 +33,18 @@ COMPILER              = gcc
 BUILD_BITS= 64
 export PARFAIT_BUILD=no
 include ../../make-rules/shared-macros.mk
+GCC_ROOT = /usr/gcc/7
 
 COMPONENT_NAME        = mysql
-COMPONENT_VERSION     = 5.7.17
+COMPONENT_VERSION     = 5.7.25
 COMPONENT_SRC         = $(COMPONENT_NAME)-$(COMPONENT_VERSION)
 COMPONENT_ARCHIVE     = $(COMPONENT_NAME)-boost-$(COMPONENT_VERSION).tar.gz
 COMPONENT_ARCHIVE_HASH= \
-         sha256:b75bba87199ef6a6ccc5dfbcaf70949009dc12089eafad8c5254afc9002aa903
-COMPONENT_ARCHIVE_URL = http://cdn.mysql.com/Downloads/MySQL-5.7/$(COMPONENT_ARCHIVE)
-COMPONENT_PROJECT_URL = http://dev.mysql.com/ 
+         sha256:354c427c8679c6a4774f60723ea211e54b4383307764d240940f960d110bf5cf
+COMPONENT_ARCHIVE_URL = https://dev.mysql.com/get/Downloads/MySQL-5.7/$(COMPONENT_ARCHIVE)
+COMPONENT_PROJECT_URL = https://dev.mysql.com/
 COMPONENT_BUGDB       = database/mysql
 COMPONENT_ANITYA_ID=	334
-
-# Requires new pkgmogrify feature, available in S12 but not 11.3, so do not
-# publish.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_64=
-INSTALL_64=
-PUBLISH_STAMP=
-endif
 
 #We use cp(1) instead of cloney because we use TAR to copy files and the TAR 
 #used doesn't handle long links

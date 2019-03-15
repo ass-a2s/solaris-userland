@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            64
@@ -35,15 +35,12 @@ COMPONENT_PROJECT_URL=	https://wiki.gnome.org/Apps/Yelp
 COMPONENT_ARCHIVE_HASH= \
 	sha256:8616b77c239aaa731312609f192c9b2c71d54b2cae42ff23efa23b5b3188778e
 COMPONENT_BUGDB=        gnome/docviewer
-COMPONENT_ANITYA_ID=	8420
+COMPONENT_ANITYA_ID=	14867
 
 TPNO=			36161
 
 # gmake check works but produces no useful output
 TEST_TARGET = $(SKIP_TEST)
-
-# Needs updated glib2, not available on S11.
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/gnome-component.mk
 

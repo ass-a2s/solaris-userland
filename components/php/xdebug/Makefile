@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 BUILD_BITS= 64
 # xdebug 2.5.1 doesn't compile with studio.
@@ -28,15 +28,15 @@ COMPILER= gcc
 include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		xdebug
-COMPONENT_VERSION=	2.5.1
+COMPONENT_VERSION=	2.7.0
 COMPONENT_ARCHIVE=	$(COMPONENT_SRC).tgz
 COMPONENT_ARCHIVE_HASH= \
-	sha256:7fda9020fd5a2c549ae5a692fcabbb00f74e39dda81d53d25e622bdab4880ec2
+	sha256:e896da91ce0373f5fd8f4ca392c68da8593932ad51b2ec5eb3ee032b50d4b2d6
 COMPONENT_ARCHIVE_URL=	http://xdebug.org/files/$(COMPONENT_ARCHIVE)
 COMPONENT_PROJECT_URL=	http://xdebug.org/
 COMPONENT_ANITYA_ID=	13302
 
-TPNO=			35000
+TPNO=			50138
 
 TEST_TARGET= $(NO_TESTS)
 include $(PHP_TOP_DIR)/phpize.mk
@@ -46,5 +46,5 @@ include $(PHP_TOP_DIR)/php.mk
 CONFIGURE_OPTIONS +=	--enable-xdebug
 
 REQUIRED_PACKAGES += system/library/math
-REQUIRED_PACKAGES += web/php-56
 REQUIRED_PACKAGES += web/php-71
+REQUIRED_PACKAGES += web/php-73

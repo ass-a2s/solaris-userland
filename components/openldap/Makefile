@@ -20,22 +20,24 @@
 #
 
 #
-# Copyright (c) 2011, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 BUILD_BITS= 64_and_32
 include ../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		openldap
-COMPONENT_VERSION=	2.4.44
-COMPONENT_PROJECT_URL=	http://www.openldap.org/
+COMPONENT_VERSION=	2.4.46
+HUMAN_VERSION=		$(COMPONENT_VERSION)-S1
+IPS_COMPONENT_VERSION=	2.4.46.0.1
 COMPONENT_ARCHIVE=	$(COMPONENT_SRC).tgz
+COMPONENT_PROJECT_URL=	http://www.openldap.org/
 COMPONENT_ARCHIVE_HASH=	\
-    sha256:d7de6bf3c67009c95525dde3a0212cc110d0a70b92af2af8e3ee800e81b88400
+    sha256:9a90dcb86b99ae790ccab93b7585a31fbcbeec8c94bf0f7ab0ca0a87ea0c4b2d
 COMPONENT_ARCHIVE_URL=	ftp://ftp.openldap.org/pub/OpenLDAP/openldap-release/$(COMPONENT_ARCHIVE)
 COMPONENT_BUGDB=	service/openldap
 COMPONENT_ANITYA_ID=	2551
 
-TPNO=			27074
+TPNO=			45033
 
 SDFVER=			sdf-2.001
 SDFBLIB=		$(BUILD_DIR_32)/${SDFVER}/blib
@@ -45,11 +47,6 @@ COMPONENT_ARCHIVE_HASH_1= \
     sha256:6f9bcdc884a9f450208c740e45effdfeb7e65c689f57b05d3c15208193a8a6ea
 COMPONENT_ARCHIVE_URL_1= ftp://ftp.eenet.ee/pub/cpan/authors/id/I/IA/IANC/$(COMPONENT_ARCHIVE_1)
 
-
-# This depends on libsasl which cannot be installed on S11.
-ifeq ($(BUILD_TYPE), evaluation)
-PUBLISH_STAMP=
-endif
 
 include $(WS_MAKE_RULES)/common.mk
 
@@ -86,7 +83,7 @@ CONFIGURE_OPTIONS += --disable-bdb
 CONFIGURE_OPTIONS += --disable-hdb
 CONFIGURE_OPTIONS += --enable-mdb
 CONFIGURE_OPTIONS += --enable-null
-CONFIGURE_OPTIONS += --enable-passwd	 
+CONFIGURE_OPTIONS += --enable-passwd
 CONFIGURE_OPTIONS += --enable-shell
 CONFIGURE_OPTIONS += --enable-ldap
 CONFIGURE_OPTIONS += --enable-meta

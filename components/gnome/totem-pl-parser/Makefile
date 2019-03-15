@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            32_and_64
@@ -31,7 +31,7 @@ include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		totem-pl-parser
 COMPONENT_VERSION=	3.10.7
-COMPONENT_PROJECT_URL=  https://github.com/GNOME/totem-pl-parser
+COMPONENT_PROJECT_URL=  https://developer.gnome.org/totem-pl-parser/
 COMPONENT_ARCHIVE_HASH= \
 	sha256:9c8285bc3131faa309d5cba5a919d5166abc2b8cc5a0c850fe861be8b14e089c
 COMPONENT_BUGDB=        gnome/multimedia
@@ -40,9 +40,6 @@ COMPONENT_ANITYA_ID=	13163
 TPNO=			34606
 
 TEST_TARGET  = $(NO_TESTS)
-
-# Needs gobject-introspection, not available on S11.3
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/gnome-component.mk
 

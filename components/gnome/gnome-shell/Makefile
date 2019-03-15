@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2016, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2016, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS=		64
@@ -38,9 +38,6 @@ COMPONENT_ANITYA_ID=	5409
 TPNO=			34687
 
 TEST_TARGET = $(NO_TESTS)
-
-# Needs mutter, not available on S11.3
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/gnome-component.mk
 
@@ -65,7 +62,7 @@ CONFIGURE_ENV += PATH=$(GNUBIN):$(PATH)
 COMPONENT_BUILD_ENV += PATH=$(GNUBIN):$(PATH)
 
 # Workaround the mozjs issue described in 24935318
-LD_EXEC_OPTIONS += -M $(PWD)/../gjs/mapfile
+LD_EXEC_OPTIONS += -M $(WS_COMPONENTS)/gnome/gjs/mapfile
 ADIHEAP_MODE = $(ADIHEAP_DISABLE)
 ADISTACK_MODE =	$(ADISTACK_DISABLE)
 
@@ -116,7 +113,7 @@ REQUIRED_PACKAGES += library/graphics/cogl
 REQUIRED_PACKAGES += library/json-glib
 REQUIRED_PACKAGES += library/libcroco
 REQUIRED_PACKAGES += library/libical
-REQUIRED_PACKAGES += library/libmozjs-24
+REQUIRED_PACKAGES += library/libmozjs-38
 REQUIRED_PACKAGES += library/libsoup
 REQUIRED_PACKAGES += library/python/pygobject-3-34
 REQUIRED_PACKAGES += library/python/simplejson-34

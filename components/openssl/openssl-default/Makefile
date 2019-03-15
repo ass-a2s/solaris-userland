@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2011, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 include ../../../make-rules/shared-macros.mk
 
@@ -30,20 +30,21 @@ COMPONENT_NAME =	openssl
 # When upgrading OpenSSL, please, DON'T FORGET TO TEST WANBOOT too. 
 # For more information about wanboot-openssl testing, please refer to
 # ../README.
-COMPONENT_VERSION =	1.0.2n
+COMPONENT_VERSION =	1.0.2r
 # Version for IPS. It is easier to do it manually than convert the letter to a
 # number while taking into account that there might be no letter at all.
-IPS_COMPONENT_VERSION = 1.0.2.14
-COMPONENT_PROJECT_URL=	http://www.openssl.org/
+IPS_COMPONENT_VERSION = 1.0.2.18
+COMPONENT_PROJECT_URL=	https://www.openssl.org/
 COMPONENT_SRC =		$(COMPONENT_NAME)-$(COMPONENT_VERSION)
 COMPONENT_ARCHIVE =	$(COMPONENT_SRC).tar.gz
 COMPONENT_ARCHIVE_HASH=	\
-    sha256:370babb75f278c39e0c50e8c4e7493bc0f18db6867478341a832a982fd15a8fe
+    sha256:ae51d08bba8a83958e894946f15303ff894d75c2b8bbd44a852b64e3fe11d0d6
 COMPONENT_ARCHIVE_URL =	$(COMPONENT_PROJECT_URL)source/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_BUGDB=	library/openssl
 COMPONENT_ANITYA_ID=	2566
 
-TPNO=			39672
+TPNO=			49718
 
 # Clone the patch files to the patches-all dir.
 # COPY_COMMON_FILES is there so that rsync is called as soon as
@@ -287,8 +288,8 @@ WANBOOT_OBJS =  \
     crypto/evp/p_lib.o crypto/evp/p_sign.o crypto/evp/p_verify.o \
     crypto/evp/pmeth_fn.o crypto/evp/pmeth_gn.o crypto/evp/pmeth_lib.o \
     crypto/ex_data.o crypto/hmac/hm_ameth.o crypto/hmac/hm_pmeth.o \
-    crypto/hmac/hmac.o crypto/lhash/lhash.o crypto/md4/md4_dgst.o \
-    crypto/md5/md5-sparcv9.o \
+    crypto/hmac/hmac.o crypto/getenv.o crypto/lhash/lhash.o \
+    crypto/md4/md4_dgst.o crypto/md5/md5-sparcv9.o \
     crypto/md5/md5_dgst.o crypto/mem.o crypto/mem_dbg.o crypto/modes/cbc128.o \
     crypto/modes/ccm128.o crypto/modes/cfb128.o crypto/modes/ctr128.o \
     crypto/modes/gcm128.o crypto/modes/ghash-sparcv9.o crypto/modes/ofb128.o \

@@ -20,25 +20,24 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
+
 BUILD_BITS= 64
 COMPILER= gcc
 include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		pidgin
 COMPONENT_VERSION=	2.12.0
-COMPONENT_PROJECT_URL=	http://www.pidgin.im
+COMPONENT_PROJECT_URL=	https://www.pidgin.im
 COMPONENT_ARCHIVE=	$(COMPONENT_SRC).tar.bz2
 COMPONENT_ARCHIVE_HASH= \
     sha256:8c3d3536d6d3c971bd433ff9946678af70a0f6aa4e6969cc2a83bb357015b7f8
-COMPONENT_ARCHIVE_URL=	http://downloads.sourceforge.net/$(COMPONENT_NAME)/$(COMPONENT_ARCHIVE)
+COMPONENT_ARCHIVE_URL=	https://downloads.sourceforge.net/$(COMPONENT_NAME)/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_ANITYA_ID=	3636
 
 TPNO=			34232
-
-# Cyrus SASL is S12-only (at least for evaluation builds).
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 TEST_TARGET= $(NO_TESTS)
 include $(WS_MAKE_RULES)/common.mk
@@ -82,8 +81,7 @@ CONFIGURE_OPTIONS +=	--disable-nm
 CONFIGURE_OPTIONS +=	--enable-consoleui
 CONFIGURE_OPTIONS +=	--with-ncurses-headers=/usr/include/ncurses
 CONFIGURE_OPTIONS +=	--disable-vv
-# 23200148 undo this once 23169155 Move developer/gnome/gettext to Userland
-CONFIGURE_OPTIONS +=	INTLTOOL_MERGE="$(PERL) /usr/bin/intltool-merge"
+CONFIGURE_OPTIONS +=	--with-system-ssl-certs=/etc/certs
 
 # We have two implementations of libcurses in Solaris. finch needs to use the
 # ncurses one. The curses implementations in turn, use libpanel, but the

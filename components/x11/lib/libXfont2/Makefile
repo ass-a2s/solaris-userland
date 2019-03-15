@@ -31,7 +31,7 @@ COMPONENT_VERSION=	2.0.3
 COMPONENT_ARCHIVE_HASH= \
 	sha256:0e8ab7fd737ccdfe87e1f02b55f221f0bd4503a1c5f28be4ed6a54586bac9c4e
 COMPONENT_BUGDB=        x11/libraries
-COMPONENT_ANITYA_ID=	#
+COMPONENT_ANITYA_ID=	17165
 
 TEST_TARGET = $(NO_TESTS)
 
@@ -48,4 +48,6 @@ COMPONENT_INSTALL_ARGS.64 += pkgconfigdir="$(DESTDIR)/usr/lib/$(MACH64)/pkgconfi
 REQUIRED_PACKAGES += library/zlib
 REQUIRED_PACKAGES += system/library/freetype-2
 REQUIRED_PACKAGES += system/library/math
+REQUIRED_PACKAGES += x11/header/x11-protocols
 REQUIRED_PACKAGES += x11/library/libfontenc
+REQUIRED_PACKAGES += x11/library/xtrans

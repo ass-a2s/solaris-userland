@@ -20,35 +20,60 @@
 #
 
 #
-# Copyright (c) 2011, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2019, Oracle and/or its affiliates. All rights reserved.
 #
-BUILD_BITS= 64
+# Build requirements, needed before inclusion of shared-macros.
+BUILD_BITS=		64
+COMPILER=		gcc
 include ../../make-rules/shared-macros.mk
 
+# Component information, used for download and packaging.
+# -------------------------------------------------------
+# BIND version encoding within IPS, our rule is:
+#   BIND <x>.<y>.<z>        =>   IPS <x>.<y>.<z>.0.<s>
+#   BIND <x>.<y>.<z>-P<n>   =>   IPS <x>.<y>.<z>.<n>.<s>
+# <s> is for Solaris specific modifications as necessary.
 COMPONENT_NAME=		bind
-COMPONENT_VERSION=	9.10.5-P3
+COMPONENT_VERSION=	9.11.6
+IPS_COMPONENT_VERSION=	9.11.6.0.0
 HUMAN_VERSION=		$(COMPONENT_VERSION)
-IPS_COMPONENT_VERSION=	9.10.5.0.3
+COMPONENT_BUGDB=	service/dns-server
+TPNO=			50036
 COMPONENT_PROJECT_URL=	http://www.isc.org/software/bind/
-COMPONENT_ANITYA_ID=	187
 
 # hash from: sha256sum $(COMPONENT_ARCHIVE) | sed 's/\(.[^ ]*\).*/sha256:\1/'
-COMPONENT_ARCHIVE_HASH=	 \
-    sha256:8d7e96b5b0bbac7b900d4c4bbb82e0956b4e509433c5fa392bb72a929b96606a
+COMPONENT_ARCHIVE_HASH=	\
+	sha256:4499007f3a6b8bba84fc757053caeabf36466d6f7d278baccef9fd109beac6d4
+
 COMPONENT_ARCHIVE_URL=	\
 	http://ftp.isc.org/isc/bind9/$(COMPONENT_VERSION)/$(COMPONENT_ARCHIVE)
+
+# ISC OpenPGP Key obtained from https://ftp.isc.org/isc/pgpkeys
+# Added to repository using command:
+#   gpg2 --homedir "$(hg root)/tools/.gnupg" --import codesign2019.txt
+# Care must be taken if mercurial merge required!
+#   see ../../doc/makefile-variables.txt
 COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).sha512.asc
-COMPONENT_BUGDB=	service/dns-server
-TPNO=			35930
+
+# For check_anitya target, see 'gmake print-ANITYA_API_URL'
+COMPONENT_ANITYA_ID=	14923
+
+# Test Targets.
+# -------------
+TEST_TARGET=		$(TEST_64)
+SYSTEM_TEST_TARGET=	$(SYSTEM_TEST_64)
 
 include $(WS_MAKE_RULES)/common.mk
+
+# Component Configuration.
+# ------------------------
 
 # PYVER is important for packaging and computing requisites.
 PYTHON_VERSION =	3.4
 PKG_MACROS +=		PYVER=$(PYTHON_VERSION)
 
-# Some patches need configure script re-creation.
-COMPONENT_PREP_ACTION +=(cd $(@D); autoreconf -vfi);
+# Patches to configure.in require configure script re-creation.
+# COMPONENT_PREP_ACTION +=(cd $(@D); autoreconf -vfi);
 
 # Specify "configure" options and features.
 # FYI, The configure options are displayed by 'named -V'.
@@ -58,9 +83,9 @@ CONFIGURE_OPTIONS +=	--with-python=$(PYTHON.$(PYTHON_VERSION))
 # - libtool: Build dynamic libraries, static libraries are not shipped.
 CONFIGURE_OPTIONS +=	--with-libtool
 # - openssl: use openssl, required for DNSSEC features.
-CONFIGURE_OPTIONS +=	--with-openssl
-# - pkcs11: Use openSSL pkcs11 engine (KMIP/KMS)
-CONFIGURE_OPTIONS +=	--with-pkcs11
+CONFIGURE_OPTIONS +=	--with-openssl=/usr
+# - pkcs11: Use openSSL pkcs11 engine
+CONFIGURE_OPTIONS +=	--with-pkcs11=/usr/lib/$(MACH64)/libpkcs11.so.1
 # - Use xml2-config found uder /usr without checking its version.
 CONFIGURE_OPTIONS +=	--with-libxml2=$(USRDIR)
 CONFIGURE_OPTIONS +=	--enable-threads
@@ -68,6 +93,10 @@ CONFIGURE_OPTIONS +=	--enable-devpoll
 # - Enabled fixed [order] resource-record sets for backward compatibility.
 # - Requires more memory to store the sets so is not the default.
 CONFIGURE_OPTIONS +=	--enable-fixed-rrset
+# Increases length of several queues by ultimately defining TUNE_LARGE.
+CONFIGURE_OPTIONS +=	--with-tuning=large
+# Enable large file support.
+CONFIGURE_OPTIONS +=	--enable-largefile
 
 # Override / set specific pathnames:
 # - DNS libraries are in usr/lib/dns - Override settings from configure.mk
@@ -77,101 +106,93 @@ CONFIGURE_OPTIONS +=	--localstatedir=$(VARDIR)
 CONFIGURE_OPTIONS +=	--with-randomdev=/dev/random
 CONFIGURE_OPTIONS +=	--with-gssapi=krb5-config
 CONFIGURE_OPTIONS +=	--with-docbook-xsl=/usr/share/sgml/docbook
+# - Python modules in vendor directory
+CONFIGURE_OPTIONS +=	--with-python-install-dir=$(PYTHON_VENDOR_PACKAGES.32)
 
 # Compiler and compiler options:
 # - configure will add "-mt" to CC which is already set in CFLAGS, so override.
 CONFIGURE_OPTIONS +=	CC="$(CC)"
 
-# Test configuration / helper targets:
-COMPONENT_TEST_MASTER = \
-	$(COMPONENT_TEST_RESULTS_DIR)/results-$(MACH).master
-
-# Run BIND testing without test interfaces configured (limited testing).
-COMPONENT_TEST_TARGETS = force-test
-
-# Normalise results for comparison:
-# Remove Date and time from Start and End lines.
-COMPONENT_TEST_TRANSFORMS += '-e "s|\(^[SE]:[^:]*:\).*|\1|"'
-# Remove task Information lines as order of that output has been seen to change.
-COMPONENT_TEST_TRANSFORMS += '-e "/^I:/d"'
-
-# Uncomment to display summary of tests at completion.
-# COMPONENT_POST_TEST_ACTION = $(NAWK) $(summarize) $(COMPONENT_TEST_OUTPUT)
-
 # Enable adiheap and adistack security extensions
-ADIHEAP_MODE =	$(ADIHEAP_ENABLE)
-ADISTACK_MODE = $(ADISTACK_ENABLE)
+ADIHEAP_MODE =		$(ADIHEAP_ENABLE)
+ADISTACK_MODE =		$(ADISTACK_ENABLE)
 
-.PHONY: test-named-version test-summary test-clean
-# summarize is a nawk script:
-# consumes the output generated by ISC's make target and provides an
-# abridged summary.  It works by looking for key elements:
-# /^T:/ = Start of a test.
-# /^I:/ = Info from a test;  collected for possible use later.
-# /^A:/ = About: summary of the test - not used here.
-# /^S:/ = Start: pathname and date time - not used here.
-# /^E:/ = End: pathname and date time - not used here.
-# /^R:/ = Result:
-#         When 'PASS' and report=1 (from command line) the result and
-#         test name are displayed.
-#         For all other results (failures) the result, test name and
-#         other collected info is displayed.
-#         Known issues may be accounted for by adding tests, for example:
-#           /^R:UNTESTED/ && name ~ /^T:dst:2:A/ {known++;}\
-#           /^R:UNRESOLVED/ && name ~ /^T:dst:1:A/ {known++;}\
-#         Though with USERLAND automated test comparison the known
-#         case is kind of obsolete now.
-# @ EOF = Display count of RESULTS:
-# i.e. R:PASS=124 R:UNTESTED=26 Total=150 if not 100% pass rate and
-# issue is not accounted for (known) the test 'issues!' is appended to
-# resulting output.
+# BIND 'install' target does not install html or pdf files into
+# PROTO_DIR.  While it is possible to instruct package generation to
+# gather files direct from SOURCE_DIR, it requires a fair amount of
+# work at each update to make sure p5m files are in order.  By
+# delivering it where we intend it to be, the Userland framework does
+# the right thing.
 #
-summarize=	'\
-		/^T:/ {name=$$0;info="";}\
-		/^I:/ {info=sprintf("%s%s\n", info, $$0);}\
-		/^R:/ {test++; result[$$1]++;}\
-		/^R:PASS/ { if (report) printf("%s: %s\n", $$1, name); next}\
-		/^R:UNRESOLVED/ && name ~ /^T:dst:2:A/ {known++;}\
-		/^R:/ {printf("%s: %s\n%s\n", $$1, name, info);}\
-		END{for (item in result)\
-				printf("%s=%d ", item, result[item]);\
-			printf("(known=%d) Total=%d%s\n", known, test, \
-				((result["R:PASS"] + known) < test)? \
-				" issues!" : "");\
-		}'
-
+# Note, patches add links to this documentation.
 #
-# COMPONENT_TEST_OUTPUT is dependent on BITS which is set depending on
-# the active build target and PYTHON_VERS!, so it's overridden here too for test-summary:
-test-summary: BITS=64
-test-summary:
-	@echo Summary of $(COMPONENT_TEST_OUTPUT)
-	@$(NAWK) $(summarize) $(COMPONENT_TEST_OUTPUT)
+COMPONENT_POST_INSTALL_ACTION +=	\
+	$(MKDIR) -p $(PROTO_DIR)/usr/share/doc/bind/html; \
+	$(FIND) $(SOURCE_DIR)/doc/arm -name "*.html" \
+	    -exec cp {} $(PROTO_DIR)/usr/share/doc/bind/html \; ; \
+	$(FIND) $(SOURCE_DIR)/doc/arm \
+	    -name isc-logo.pdf -prune -o -name "*.pdf" \
+	    -exec cp {} $(PROTO_DIR)/usr/share/doc/bind \; ;
 
-test-named-version: install
-	@if [ -e $(PROTO_DIR)$(CONFIGURE_SBINDIR.64)/named ]; then \
-		echo '64bit version:'; \
-		file $(PROTO_DIR)$(CONFIGURE_SBINDIR.64)/named; \
-		LD_LIBRARY_PATH=$(PROTO_DIR)$(CONFIGURE_LIBDIR.64) \
-			$(PROTO_DIR)$(CONFIGURE_SBINDIR.64)/named -V; \
-	 else \
-		echo '64bit version not found.'; \
-	 fi;
+# Identify source_file files in hard links for manifest generator.
+PKG_HARDLINKS +=	usr/sbin/named
 
-test-clean:
-	$(RM) $(TEST_64)
+# Test configuration.
+# -------------------
+# Target 'test' is run from PROTO_DIR, while 'system-test' uses root
+# ("/") directory.
+#
+# BIND has its own test target which requires IP addresses 10.53.0.1
+# through 10.53.0.8 to be configured.  Those are not normally
+# configured on the build server so for now do some basic testing
+# rather than $(NO_TESTS).
+#
+TEST_HOSTNAME :=	$(shell uname -n)	# To redact from test output.
+COMPONENT_TEST_TRANSFORMS +=	\
+	'-e "s|$(PROTO_DIR)||g" ' \
+	'-e "s|$(BUILD_DIR)|\\$$(BUILD_DIR)|g" ' \
+	'-e "s|<id:[^>]*>$$|<id:REDACTED>|" ' \
+	'-e "s| id: [0-9].*$$| id: REDACTED|g" ' \
+	'-e "s| COOKIE: [^ ]* | COOKIE: REDACTED |g" ' \
+	'-e "/;; WHEN:/d" ' \
+	'-e "/;; Query time:/d" ' \
+	'-e "/^REDACT:/d" ' \
+	'-e "s|$(TEST_HOSTNAME)*[^$$ ]*|\\$$(HOSTNAME)|g" ' \
+	'-e "s|rcvd: [0-9]*|rcvd: REDACTED|"g ' \
+	'-e "s|bytes [0-9]*|bytes REDACTED|"g ' \
+	'-e "s|$(COMPONENT_VERSION)|\\$$(COMPONENT_VERSION)|g" '
 
-# Package dependencies
+COMPONENT_TEST_MASTER =	$(COMPONENT_TEST_RESULTS_DIR)/results-all.master
+COMPONENT_TEST_ENV +=	LD_LIBRARY_PATH=$(PROTO_DIR)$(CONFIGURE_LIBDIR.64)
+COMPONENT_TEST_CMD =	ksh  $(COMPONENT_DIR)/Solaris/testing.ksh
+COMPONENT_TEST_ARGS =	-d $(BUILD_DIR)/test/config
+COMPONENT_TEST_ARGS +=	-p $(PROTO_DIR)
+
+COMPONENT_SYSTEM_TEST_TARGETS =
+COMPONENT_SYSTEM_TEST_CMD =	$(COMPONENT_TEST_CMD)
+COMPONENT_SYSTEM_TEST_ARGS =	-d /tmp/BIND/test/config
+COMPONENT_SYSTEM_TEST_ARGS +=	-p /
+
+COMPONENT_TEST_TRANSFORMS +=	\
+	'-e "s|/tmp/BIND|\\$$(BUILD_DIR)|g" '
+
+# This is a handy test target for developer.  Please leave functional.
+test-named-version:
+	LD_LIBRARY_PATH=$(PROTO_DIR)$(CONFIGURE_LIBDIR.64) \
+		$(PROTO_DIR)$(CONFIGURE_SBINDIR.64)/named -V; \
+
+# Package dependencies.
+# ---------------------
 # Created by 'gmake REQUIRED_PACKAGES', manually verified.
 REQUIRED_PACKAGES += library/json-c
 REQUIRED_PACKAGES += library/libedit
 REQUIRED_PACKAGES += library/libxml2
 REQUIRED_PACKAGES += library/security/openssl
 REQUIRED_PACKAGES += library/security/openssl/openssl-fips-140
+REQUIRED_PACKAGES += library/zlib
 REQUIRED_PACKAGES += network/dns/bind
 REQUIRED_PACKAGES += runtime/python-34
 REQUIRED_PACKAGES += security/kerberos-5
-$(SOLARIS_11_3_ONLY)REQUIRED_PACKAGES += service/security/kerberos-5
 REQUIRED_PACKAGES += shell/ksh93
 REQUIRED_PACKAGES += system/core-os
-$(SOLARIS_11_3_ONLY)REQUIRED_PACKAGES += system/library/security/gss
+REQUIRED_PACKAGES += system/library/smf

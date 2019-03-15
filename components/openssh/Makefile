@@ -20,39 +20,41 @@
 #
 
 #
-# Copyright (c) 2013, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2019, Oracle and/or its affiliates. All rights reserved.
 #
+
 BUILD_BITS= 64
 COMPILER= gcc
 include ../../make-rules/shared-macros.mk
 
+#
+# When updating the version of OpenSSH you must add the release notes
+# for *all* skipped versions and the new version.
+#
+# Run:
+#  curl https://www.openssh.com/txt/release-X.Y > release-notes/release-X.Y.txt
+# Then add a line to network-ssh.p5m to deliver them.
+
 COMPONENT_NAME=		openssh
-COMPONENT_VERSION=	7.5p1
+COMPONENT_VERSION=	7.7p1
 HUMAN_VERSION=		$(COMPONENT_VERSION)
 COMPONENT_ANITYA_ID=	2565
 
 # Version for IPS.  The encoding rules are:
 #   OpenSSH <x>.<y>p<n>     => IPS <x>.<y>.0.<n>
 #   OpenSSH <x>.<y>.<z>p<n> => IPS <x>.<y>.<z>.<n>
-IPS_COMPONENT_VERSION=	7.5.0.1
+IPS_COMPONENT_VERSION=	7.7.0.1
 
-COMPONENT_PROJECT_URL=	http://www.openssh.org/
-COMPONENT_ARCHIVE_HASH=	sha256:9846e3c5fab9f0547400b4d2c017992f914222b3fd1f8eee6c7dc6bc5e59f9f0
-COMPONENT_ARCHIVE_URL=	http://mirrors.sonic.net/pub/OpenBSD/OpenSSH/portable/$(COMPONENT_ARCHIVE)
+COMPONENT_PROJECT_URL=	https://www.openssh.com/
+COMPONENT_ARCHIVE_HASH=	sha256:d73be7e684e99efcd024be15a30bffcbe41b012b2f7b3c9084aed621775e6b8f
+COMPONENT_ARCHIVE_URL=	https://mirrors.sonic.net/pub/OpenBSD/OpenSSH/portable/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 
-TPNO_OPENSSH=		34574
+TPNO_OPENSSH=		42310
 TPNO_GSSKEX=		20377
 
 # Because of set up requirements, test suite is in stc gate.
 TEST_TARGET= $(SKIP_TEST)
-
-# 11.3 has conflicts with ON's SunSSH package, which had not yet added
-# mediated links, thus cannot be updated to.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_64=
-INSTALL_64=
-PUBLISH_STAMP=
-endif
 
 include $(WS_MAKE_RULES)/common.mk
 
@@ -71,12 +73,6 @@ CFLAGS += -DOPENSSL_NO_RC4
 CFLAGS += -DWITHOUT_HMAC_MD5
 CFLAGS += -DSFTP_AUDIT
 CFLAGS += -DDEFAULT_PKCS11_WHITELIST='\"/lib/$(MACH64)/*,/usr/lib/$(MACH64)/*,/usr/lib/security/$(MACH64)/*\"'
-
-# We need to disable lazyloading of dynamic dependent libraries. During the
-# pre-authentication phase, sshd will chroot to /var/empty which doesn't
-# contain any files. If we use lazyloading, sshd will fail to find any
-# libraries that it needs.
-LDFLAGS += $(LD_B_DIRECT) -z nolazyload
 
 # Enable adiheap and adistack security extensions
 ADIHEAP_MODE =	$(ADIHEAP_ENABLE)
@@ -104,6 +100,7 @@ CONFIGURE_OPTIONS += --libexecdir=$(USRLIBDIR)/ssh
 CONFIGURE_OPTIONS += --sbindir=$(USRLIBDIR)/ssh
 CONFIGURE_OPTIONS += --sysconfdir=$(ETCDIR)/ssh
 CONFIGURE_OPTIONS += --disable-lastlog
+CONFIGURE_OPTIONS += --without-hardening
 
 # Copy the sftp dtrace provider file and the header file to source directory
 COMPONENT_PRE_BUILD_ACTION = \
@@ -122,6 +119,7 @@ REQUIRED_PACKAGES += library/security/openssl
 REQUIRED_PACKAGES += library/zlib
 REQUIRED_PACKAGES += security/kerberos-5
 REQUIRED_PACKAGES += system/core-os
+REQUIRED_PACKAGES += system/library/pam-core
 REQUIRED_PACKAGES += system/library/gcc/gcc-c-runtime
 REQUIRED_PACKAGES += system/network
 REQUIRED_PACKAGES += text/groff/groff-core

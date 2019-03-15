@@ -34,12 +34,10 @@ COMPONENT_PROJECT_URL=	http://www.postfix.org
 COMPONENT_ARCHIVE_HASH=	\
     sha256:d06849418d119d09366997b2b481bb23f737629769b4e4a52da42fb3ad8b0576
 COMPONENT_ARCHIVE_URL=	https://archive.mgm51.com/mirrors/$(COMPONENT_NAME)-source/official/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).sig
 COMPONENT_ANITYA_ID=	3693
 
 TPNO=			36084
-
-# Depends on cyrus-sasl which is on the do-not-publish list.
-include ../../make-rules/no-evaluation.mk
 
 BUILD_STYLE= justmake
 TEST_TARGET= $(NO_TESTS)

@@ -20,25 +20,25 @@
 #
 
 #
-# Copyright (c) 2011, 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 include ../../../make-rules/shared-macros.mk
 
 PATH=/usr/bin:/usr/gnu/bin:/usr/sbin
 
 COMPONENT_NAME=		Python
-COMPONENT_VERSION=	2.7.14
+COMPONENT_VERSION=	2.7.15
 COMPONENT_PROJECT_URL=	https://python.org/
 COMPONENT_SRC=		$(COMPONENT_NAME)-$(COMPONENT_VERSION)
 COMPONENT_ARCHIVE=	$(COMPONENT_SRC).tar.xz
 COMPONENT_ARCHIVE_HASH=	\
-    sha256:71ffb26e09e78650e424929b2b457b9c912ac216576e6bd9e7d204ed03296a66
+    sha256:22d9b1ac5b26135ad2b8c2901a9413537e08749a753356ee913c84dbd2df5574
 COMPONENT_ARCHIVE_URL=	$(COMPONENT_PROJECT_URL)ftp/python/$(COMPONENT_VERSION)/$(COMPONENT_ARCHIVE)
 COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_BUGDB=	utility/python
 COMPONENT_ANITYA_ID=	13255
 
-TPNO=			39113
+TPNO=			44360
 
 include $(WS_MAKE_RULES)/prep.mk
 include $(WS_MAKE_RULES)/configure.mk
@@ -200,9 +200,9 @@ COMPONENT_TEST_TARGETS = test
 # The test output contains details from each test, in whatever order they
 # complete.  The default _TRANSFORMER is not powerful enough to deal with
 # this; we need heavier artillery.  Extract just the sections that start
-# with "tests OK." and end with "Makefile: " for comparison.
+# with "tests OK." and end with "Total duration: " for comparison.
 COMPONENT_TEST_TRANSFORMER =	$(NAWK)
-COMPONENT_TEST_TRANSFORMS =	"'/tests OK./ {results = 1}; /Makefile:/ {results = 0} {if (results) print $0 } '"
+COMPONENT_TEST_TRANSFORMS =	"'/tests OK./ {results = 1}; /Total duration:/ {results = 0} {if (results) print $0 } '"
 
 COMPONENT_SYSTEM_TEST_ENV = EXTRATESTOPTS="-v -uall,-network $(TESTOPTS_PYTHON_TEST)"
 COMPONENT_SYSTEM_TEST_TARGETS = 
@@ -228,5 +228,6 @@ REQUIRED_PACKAGES += runtime/tcl-8
 REQUIRED_PACKAGES += runtime/tk-8
 REQUIRED_PACKAGES += shell/ksh93
 REQUIRED_PACKAGES += system/core-os
+REQUIRED_PACKAGES += system/library/datalink
 REQUIRED_PACKAGES += system/library/math
 REQUIRED_PACKAGES += x11/library/libx11

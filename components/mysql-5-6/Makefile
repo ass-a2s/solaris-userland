@@ -20,30 +20,23 @@
 #
 
 #
-# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 BUILD_BITS= 64_and_32
 export PARFAIT_BUILD=no
 include ../../make-rules/shared-macros.mk
 
 COMPONENT_NAME        = mysql
-COMPONENT_VERSION     = 5.6.39
+COMPONENT_VERSION     = 5.6.43
 COMPONENT_SRC         = $(COMPONENT_NAME)-$(COMPONENT_VERSION)
 COMPONENT_ARCHIVE     = $(COMPONENT_SRC).tar.gz
 COMPONENT_ARCHIVE_HASH= \
-         sha256:ab1814b03af77bf88dc381eff558ed2e73e19e8e5a4170a78ba3370cd5da434d
-COMPONENT_ARCHIVE_URL = http://cdn.mysql.com/Downloads/MySQL-5.6/$(COMPONENT_ARCHIVE)
-COMPONENT_PROJECT_URL = http://dev.mysql.com/ 
+         sha256:1c95800bf0e1b7a19a37d37fbc5023af85c6bc0b41532433b3a886263a1673ef
+COMPONENT_ARCHIVE_URL = https://cdn.mysql.com/Downloads/MySQL-5.6/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=      $(COMPONENT_ARCHIVE_URL).asc
+COMPONENT_PROJECT_URL = https://dev.mysql.com/ 
 COMPONENT_BUGDB       = database/mysql
 COMPONENT_ANITYA_ID=	334
-
-# Requires newer version of system/library/c++-runtime from Studio, available
-# in S12 but not 11.3, so do not publish.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_32_and_64=
-INSTALL_32_and_64=
-PUBLISH_STAMP=
-endif
 
 #We use cp(1) instead of cloney because we use TAR to copy files and the TAR 
 #used doesn't handle long links

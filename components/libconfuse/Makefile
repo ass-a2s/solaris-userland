@@ -20,18 +20,19 @@
 #
 
 #
-# Copyright (c) 2011, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2018, Oracle and/or its affiliates. All rights reserved.
 #
+
 BUILD_BITS= 64_and_32
 include ../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		libconfuse
 COMPONENT_VERSION=	3.2
 COMPONENT_SRC_NAME=	confuse
-COMPONENT_PROJECT_URL=	http://www.nongnu.org/confuse/
+COMPONENT_PROJECT_URL=	https://github.com/martinh/$(COMPONENT_NAME)
 COMPONENT_ARCHIVE_HASH=	\
     sha256:166d1d0611de05587447d91fb44b31188cb229c9aaa5aff79ae4706e04dffa09
-COMPONENT_ARCHIVE_URL=	https://github.com/martinh/$(COMPONENT_NAME)/releases/download/v$(COMPONENT_VERSION)/$(COMPONENT_ARCHIVE)
+COMPONENT_ARCHIVE_URL=	$(COMPONENT_PROJECT_URL)/releases/download/v$(COMPONENT_VERSION)/$(COMPONENT_ARCHIVE)
 COMPONENT_BUGDB=	library/libconfuse
 COMPONENT_ANITYA_ID=	1581
 
@@ -39,9 +40,6 @@ TPNO=			37084
 
 TEST_TARGET= install $(TEST_32_and_64)
 SYSTEM_TEST_TARGET= configure $(SYSTEM_TEST_32_and_64)
-
-# Depends on S12-only function in ON.
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/common.mk
 

@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            64_and_32
@@ -31,20 +31,13 @@ include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		gcr
 COMPONENT_VERSION=	3.20.0
-COMPONENT_PROJECT_URL=	https://github.com/GNOME/gcr
+COMPONENT_PROJECT_URL=	https://developer.gnome.org/gcr/
 COMPONENT_ARCHIVE_HASH= \
 	sha256:90572c626d8a708225560c42b4421f7941315247fa1679d4ef569bde7f4bb379
 COMPONENT_BUGDB=        gnome/security
 COMPONENT_ANITYA_ID=	11801
 
 TPNO=			35785
-
-# Needs gobject-introspection, not available on S11.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_32_and_64=
-INSTALL_32_and_64=
-PUBLISH_STAMP=
-endif
 
 include $(WS_MAKE_RULES)/gnome-component.mk
 

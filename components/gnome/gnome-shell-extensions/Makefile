@@ -20,9 +20,8 @@
 #
 
 #
-# Copyright (c) 2016, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
 #
-
 
 BUILD_BITS=             64
 COMPILER=               gcc
@@ -30,7 +29,7 @@ include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		gnome-shell-extensions
 COMPONENT_VERSION=	3.24.0
-COMPONENT_PROJECT_URL=  https://extensions.gnome.org
+COMPONENT_PROJECT_URL=  https://wiki.gnome.org/Projects/GnomeShell/Extensions
 COMPONENT_ARCHIVE_HASH= \
 	sha256:a1f453cce7543a09f3d5515918a6fe903c1b4aa578f7367335dd1a8121d2618f
 COMPONENT_ANITYA_ID=	1195
@@ -38,9 +37,6 @@ COMPONENT_ANITYA_ID=	1195
 TPNO=			39313
 
 TEST_TARGET = $(NO_TESTS)
-
-# It's useless without gnome-shell which is not available on S11.3
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/gnome-component.mk
 

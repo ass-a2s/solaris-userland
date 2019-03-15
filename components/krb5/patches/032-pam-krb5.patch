@@ -242,7 +242,7 @@
      return(ret);
 --- a/src/slave/kpropd.c
 +++ b/src/slave/kpropd.c
-@@ -623,6 +623,7 @@ do_iprop()
+@@ -646,6 +646,7 @@ do_iprop()
      kdb_last_t mylast;
      kdb_fullresync_result_t *full_ret;
      kadm5_iprop_handle_t handle;
@@ -250,7 +250,7 @@
  
      if (debug)
          fprintf(stderr, _("Incremental propagation enabled\n"));
-@@ -632,8 +633,8 @@ do_iprop()
+@@ -655,8 +656,8 @@ do_iprop()
          pollin = 10;
  
      if (master_svc_princstr == NULL) {
@@ -261,7 +261,7 @@
          if (retval) {
              com_err(progname, retval,
                      _("%s: unable to get kiprop host based "
-@@ -641,6 +642,15 @@ do_iprop()
+@@ -664,6 +665,15 @@ do_iprop()
                      progname, realm);
              return retval;
          }

@@ -20,18 +20,19 @@
 #
 
 #
-# Copyright (c) 2016, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 include ../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		serf
 COMPONENT_VERSION=	1.3.9
 COMPONENT_SRC=		$(COMPONENT_NAME)-$(COMPONENT_VERSION)
-COMPONENT_PROJECT_URL=	http://serf.apache.org/
+COMPONENT_PROJECT_URL=	https://serf.apache.org/
 COMPONENT_ARCHIVE=	$(COMPONENT_SRC).tar.bz2
 COMPONENT_ARCHIVE_HASH=	\
     sha256:549c2d21c577a8a9c0450facb5cca809f26591f048e466552240947bdf7a87cc
 COMPONENT_ARCHIVE_URL=	https://www.apache.org/dist/$(COMPONENT_NAME)/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_BUGDB=	library/libserf
 COMPONENT_ANITYA_ID=	1720
 
@@ -42,8 +43,8 @@ include $(WS_MAKE_RULES)/prep.mk
 include $(WS_MAKE_RULES)/justmake.mk
 include $(WS_MAKE_RULES)/ips.mk
 
-USED_APR =		/usr/apr/1.5
-USED_APU =		/usr/apr-util/1.5
+USED_APR =		/usr/apr/1.6
+USED_APU =		/usr/apr-util/1.6
 
 APR_32 =		$(USED_APR)/bin/apr-1-config
 APR_64 =		$(USED_APR)/bin/$(MACH64)/apr-1-config
@@ -95,10 +96,9 @@ test:		$(TEST_32_and_64)
 system-test:	$(SYSTEM_TESTS_NOT_IMPLEMENTED)
 
 REQUIRED_PACKAGES += developer/build/scons-27
-REQUIRED_PACKAGES += library/apr-15
-REQUIRED_PACKAGES += library/apr-util-15
+REQUIRED_PACKAGES += library/apr-16
+REQUIRED_PACKAGES += library/apr-util-16
 REQUIRED_PACKAGES += library/expat
-$(SOLARIS_11_3_ONLY)REQUIRED_PACKAGES += library/openldap
 REQUIRED_PACKAGES += library/security/openssl
 REQUIRED_PACKAGES += library/zlib
 REQUIRED_PACKAGES += system/library

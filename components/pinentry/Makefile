@@ -20,31 +20,27 @@
 #
 
 #
-# Copyright (c) 2011, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2018, Oracle and/or its affiliates. All rights reserved.
 #
+
 BUILD_BITS= 64
 include ../../make-rules/shared-macros.mk
 
 PATH = $(GNUBIN):$(USRBINDIR)
 
 COMPONENT_NAME=		pinentry
-COMPONENT_VERSION=	0.9.7
+COMPONENT_VERSION=	1.1.0
 COMPONENT_PROJECT_URL=	http://www.gnupg.org/related_software/pinentry/
 COMPONENT_ARCHIVE=     $(COMPONENT_SRC).tar.bz2
 COMPONENT_ARCHIVE_HASH=	\
-    sha256:6398208394972bbf897c3325780195584682a0d0c164ca5a0da35b93b1e4e7b2
-COMPONENT_ARCHIVE_URL=	ftp://ftp.gnupg.org/gcrypt/pinentry/$(COMPONENT_ARCHIVE)
+    sha256:68076686fa724a290ea49cdf0d1c0c1500907d1b759a3bcbfbec0293e8f56570
+COMPONENT_ARCHIVE_URL=	https://gnupg.org/ftp/gcrypt/pinentry/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=      $(COMPONENT_ARCHIVE_URL).sig
+
 COMPONENT_BUGDB=	utility/gnupg
 COMPONENT_ANITYA_ID=	3643
 
-TPNO=			26271
-
-# Requires updated version of gtk2, not available on S11.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_64=
-INSTALL_64=
-PUBLISH_STAMP=
-endif
+TPNO=			42856
 
 INSTALL_TARGET=
 TEST_TARGET= $(NO_TESTS)
@@ -93,14 +89,12 @@ CONFIGURE_OPTIONS  +=		--disable-ncurses
 CONFIGURE_OPTIONS  +=		--disable-libsecret
 
 install: $(INSTALL_64)
-ifneq ($(BUILD_TYPE), evaluation)
 	$(MKDIR) $(PROTOUSRLIBDIR)
 	if test -f $(PROTOUSRBINDIR)/pinentry-curses ; then \
 	$(MV) $(PROTOUSRBINDIR)/pinentry-curses $(PROTOUSRLIBDIR)/ ; fi
 	if test -f $(PROTOUSRBINDIR)/pinentry-gtk-2 ; then \
 	$(MV) $(PROTOUSRBINDIR)/pinentry-gtk-2 $(PROTOUSRLIBDIR)/ ; fi
 	cd $(PROTOUSRLIBDIR) && ln -sf pinentry-gtk-2 pinentry
-endif
 
 REQUIRED_PACKAGES += library/desktop/gtk2
 REQUIRED_PACKAGES += library/glib2

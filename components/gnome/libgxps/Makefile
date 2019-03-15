@@ -31,6 +31,7 @@ include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		libgxps
 COMPONENT_VERSION=	0.2.5
+COMPONENT_PROJECT_URL=	https://wiki.gnome.org/Projects/libgxps
 COMPONENT_ARCHIVE_HASH=	\
     sha256:3e7594c5c9b077171ec9ccd3ff2b4f4c4b29884d26d4f35e740c8887b40199a0
 COMPONENT_BUGDB=	gnome/libraries
@@ -39,13 +40,6 @@ COMPONENT_ANITYA_ID=	1629
 TPNO=			34503
 
 TEST_TARGET= $(SKIP_TEST)
-
-# Needs updated glib2, not available on S11.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_32_and_64=
-INSTALL_32_and_64=
-PUBLISH_STAMP=
-endif
 
 include $(WS_MAKE_RULES)/gnome-component.mk
 

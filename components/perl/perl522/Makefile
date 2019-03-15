@@ -20,13 +20,14 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		perl
 COMPONENT_VERSION=	5.22.1
+IPS_COMPONENT_VERSION=	$(COMPONENT_VERSION).1
 PERL_VERSION_LOCAL=	5.22
 COMPONENT_PROJECT_URL=	http://www.perl.org/
 COMPONENT_SRC=		$(COMPONENT_NAME)-$(COMPONENT_VERSION)
@@ -37,7 +38,7 @@ COMPONENT_ARCHIVE_URL=	http://www.cpan.org/src/5.0/$(COMPONENT_ARCHIVE)
 COMPONENT_BUGDB=	utility/perl
 COMPONENT_ANITYA_ID=	13599
 
-TPNO=			26810
+TPNO=			42491
 
 include $(WS_MAKE_RULES)/prep.mk
 include $(WS_MAKE_RULES)/configure.mk
@@ -126,6 +127,7 @@ COMPONENT_BUILD_ENV	  +=	PATH=$(dir $(CC)):$(PATH)
 COMPONENT_INSTALL_ENV	  +=	PATH=$(dir $(CC)):$(PATH)
 COMPONENT_INSTALL_ENV	  +=	DESTDIR="$(PROTO_DIR)"
 COMPONENT_TEST_ENV	  +=	PATH=$(dir $(CC)):$(PATH)
+COMPONENT_TEST_ENV	  +=	PERL_USE_UNSAFE_INC=1
 #
 # Getting 1 different result between sparc and x86.
 #
@@ -146,6 +148,14 @@ COMPONENT_TEST_TRANSFORMS += \
 #
 PKG_MACROS 		+=	P_ARCH=$(shell arch)
 PKG_MACROS		+=	PERL_VERSION=$(PERL_VERSION_LOCAL)
+
+# Force a deterministic choice of which is the file & which is the hardlink,
+# otherwise it may vary between runs of pkgsend generate / manifest-check
+PKG_HARDLINKS += usr/perl5/$(PERL_VERSION)/bin/pstruct
+PKG_HARDLINKS += usr/perl5/$(PERL_VERSION)/bin/perl
+PKG_HARDLINKS += usr/perl5/$(PERL_VERSION)/bin/perlbug
+PKG_HARDLINKS += usr/perl5/$(PERL_VERSION)/man/man1/c2ph.1
+PKG_HARDLINKS += usr/perl5/$(PERL_VERSION)/man/man1/perlthanks.1
 
 configure:	$(CONFIGURE_64)
 

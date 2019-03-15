@@ -20,8 +20,9 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2019, Oracle and/or its affiliates. All rights reserved.
 #
+
 BUILD_BITS= 64_and_32
 include ../../make-rules/shared-macros.mk
 
@@ -37,10 +38,10 @@ COMPONENT_NAME=		cyrus-sasl
 # in the dependency at the bottom of the openldap/openldap.p5m file.
 #
 COMPONENT_VERSION=	2.1.26
-COMPONENT_PROJECT_URL=	ftp://ftp.cyrusimap.org/cyrus-sasl
+COMPONENT_PROJECT_URL=	https://www.cyrusimap.org/sasl/
 COMPONENT_ARCHIVE_HASH=	\
     sha256:8fbc5136512b59bb793657f36fadda6359cae3b08f01fd16b3d406f1345b7bc3
-COMPONENT_ARCHIVE_URL= $(COMPONENT_PROJECT_URL)/$(COMPONENT_ARCHIVE)
+COMPONENT_ARCHIVE_URL=	ftp://ftp.cyrusimap.org/cyrus-sasl/$(COMPONENT_ARCHIVE)
 COMPONENT_ANITYA_ID=	13280
 
 # Check DONOTUSE items when updating the version and hash
@@ -57,14 +58,6 @@ PROTO_CONFDIR = $(PROTO_DIR)$(SASL_CONFDIR)
 
 TESTS_DIR=$(PROTO_DIR)/tests
 TESTS_32_DIR=$(TESTS_DIR)/$(MACH32)
-
-# Migrated from ON in S12, including stuff from system/header, so this
-# cannot be installed on an S11 box.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_32_and_64=
-INSTALL_32_and_64=
-PUBLISH_STAMP=
-endif
 
 INSTALL_TARGET=
 TEST_TARGET= $(NO_TESTS)
@@ -140,9 +133,9 @@ COMPONENT_POST_BUILD_ACTION += \
     -o $(BUILD_DIR_$(BITS))/lib/.libs/libsasl.so.1 \
     -G -hlibsasl.so.1 $(LD_B_DIRECT) $(LD_Z_DEFS) -M$(COMPONENT_DIR)/mapfile ; \
     (cd $(BUILD_DIR_$(BITS))/sample; $(ENV) $(COMPONENT_BUILD_ENV) \
-    	$(MAKE) sample-client sample-server) ; \
+	$(MAKE) sample-client sample-server) ; \
     (cd $(BUILD_DIR_$(BITS))/utils; $(ENV) $(COMPONENT_BUILD_ENV) \
-    	$(MAKE) testsuite) ;
+	$(MAKE) testsuite) ;
 
 COMPONENT_POST_INSTALL_ACTION += \
         $(CP) $(BUILD_DIR_$(BITS))/utils/.libs/testsuite \
@@ -176,7 +169,7 @@ CLEAN_PATHS += $(TARBALL_DIR)
 
 test_tarball:	sasltest.tgz
 TEST_SCRIPTS= setup_testsuite run_testsuite transform-results cleanup \
-	setup-for-mit setup-for-seam
+	setup-for-mit
 
 sasltest.tgz:	install
 	$(MKDIR) $(TARBALL_DIR)
@@ -191,4 +184,5 @@ REQUIRED_PACKAGES += database/berkeleydb-5
 REQUIRED_PACKAGES += developer/build/automake-115
 REQUIRED_PACKAGES += library/security/openssl
 REQUIRED_PACKAGES += security/kerberos-5
+REQUIRED_PACKAGES += system/library/pam-core
 REQUIRED_PACKAGES += system/network/ldap/openldap

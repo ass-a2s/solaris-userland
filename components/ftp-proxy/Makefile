@@ -18,8 +18,11 @@
 #
 # CDDL HEADER END
 #
-# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
+
 #
+# Copyright (c) 2014, 2019, Oracle and/or its affiliates. All rights reserved.
+#
+
 BUILD_BITS= 64
 include ../../make-rules/shared-macros.mk
 
@@ -38,17 +41,13 @@ COMPONENT_BUGDB=	service/ftp-proxy
 
 TPNO=	24255
 
-# Depends on S12-only changes in ON.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_64=
-INSTALL_64=
-PUBLISH_STAMP=
-endif
-
 BUILD_STYLE= justmake
 TEST_TARGET= $(NO_TESTS)
 include $(WS_MAKE_RULES)/common.mk
 
+COMPONENT_PRE_BUILD_ACTION = \
+	($(CP) ftp-proxy.Solaris/smf-config.c $(@D)/. ; \
+	$(CP) ftp-proxy.Solaris/smf-config.h $(@D)/. )
 #
 # Don't overwrite CFLAGS here, just add our options there.
 #
@@ -63,3 +62,4 @@ REQUIRED_PACKAGES += network/firewall
 REQUIRED_PACKAGES += shell/ksh93
 REQUIRED_PACKAGES += system/core-os
 REQUIRED_PACKAGES += system/header
+REQUIRED_PACKAGES += system/library/smf

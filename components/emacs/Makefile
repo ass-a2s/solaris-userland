@@ -51,9 +51,6 @@ CONFIGURE_64 = $(VARIANTS:%=$(BUILD_DIR)/$(MACH64)-%/.configured)
 BUILD_64 = $(VARIANTS:%=$(BUILD_DIR)/$(MACH64)-%/.built)
 INSTALL_64 = $(VARIANTS:%=$(BUILD_DIR)/$(MACH64)-%/.installed)
 
-# Depends on newer cairo, which cannot be updated in S11.
-include $(WS_MAKE_RULES)/no-evaluation.mk
-
 include $(WS_MAKE_RULES)/gnu-component.mk
 
 # emacs creates a directory in usr/lib/emacs/$(COMPONENT_VERSION) that
@@ -75,11 +72,6 @@ LD_MAP_NOEXDATA.sparc=
 # the 'gmake build' stage.
 #
 #CONFIGURE_PREFIX =	$(PROTO_DIR)/usr
-
-# The configure script runs the pkg-config command. This allows it to
-# find the non-default GnuTLS v3 library.
-PKG_CONFIG_PATH.64 := $(PKG_CONFIG_PATH.64)/gnutls-3:$(PKG_CONFIG_PATH.64)
-LDFLAGS += -L$(USRLIBDIR64)/gnutls-3
 
 # Starting with emacs 25.2, the emacs executable uses trig functions (sin, cos)
 # that are not satisfied by libc. Rather than patch the configure process
@@ -228,12 +220,8 @@ COMPONENT_POST_INSTALL_ACTION += $(GUNZIP) \
 	$(PROTO_DIR)/usr/share/man/man1/*.gz ;
 
 # common targets
-ifneq ($(BUILD_TYPE), evaluation)
 install:	$(BUILD_64) $(BUILD_DIR)/$(MACH64)-x/.installed 
-endif
 
-# Desktop packages differ slightly between S11 & S12: list union to allow
-# for BUILD_TYPE=evaluation and normal builds.
 REQUIRED_PACKAGES += editor/gnu-emacs
 REQUIRED_PACKAGES += file/gnu-findutils
 REQUIRED_PACKAGES += gnome/config/gconf
@@ -243,11 +231,9 @@ REQUIRED_PACKAGES += image/library/librsvg
 REQUIRED_PACKAGES += image/library/libtiff
 REQUIRED_PACKAGES += library/desktop/cairo
 REQUIRED_PACKAGES += library/desktop/gdk-pixbuf
-REQUIRED_PACKAGES += library/desktop/gtk2
 REQUIRED_PACKAGES += library/desktop/gtk3
 REQUIRED_PACKAGES += library/desktop/pango
 REQUIRED_PACKAGES += library/glib2
-REQUIRED_PACKAGES += library/gnutls
 REQUIRED_PACKAGES += library/gnutls-3
 REQUIRED_PACKAGES += library/libxml2
 REQUIRED_PACKAGES += library/ncurses

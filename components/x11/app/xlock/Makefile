@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2018, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS= 64
@@ -32,6 +32,7 @@ COMPONENT_SRC=          sun-src
 COMPONENT_ARCHIVE=	
 COMPONENT_ARCHIVE_SRC=	none
 COMPONENT_BUGDB=	x11/xclients
+COMPONENT_ANITYA_ID=	N/A
 
 TPNO=	9808
 
@@ -46,4 +47,5 @@ COMPONENT_INSTALL_ENV += 	INSTALL="$(INSTALL) -D"
 COMPONENT_INSTALL_ENV += 	PREFIX="$(USRDIR)"
 
 REQUIRED_PACKAGES += system/library/math
+REQUIRED_PACKAGES += system/library/pam-core
 REQUIRED_PACKAGES += x11/library/libx11

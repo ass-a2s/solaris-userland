@@ -20,28 +20,27 @@
 #
 
 #
-# Copyright (c) 2014, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2019, Oracle and/or its affiliates. All rights reserved.
 #
+
 BUILD_BITS= 64
 include ../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		apache2
-COMPONENT_VERSION=	2.4.29
-COMPONENT_PROJECT_URL=	http://httpd.apache.org/
+COMPONENT_VERSION=	2.4.38
+COMPONENT_PROJECT_URL=	https://httpd.apache.org/
 COMPONENT_SRC_NAME=	httpd
 COMPONENT_ARCHIVE_HASH=	\
-    sha256:948e4a11278a5954698b880b30f401b1e9ab743713ee2c7280a54dd4ddd87085
-COMPONENT_ARCHIVE_URL=	http://archive.apache.org/dist/httpd/$(COMPONENT_ARCHIVE)
+    sha256:38d0b73aa313c28065bf58faf64cec12bf7c7d5196146107df2ad07541aa26a6
+COMPONENT_ARCHIVE_URL=	https://archive.apache.org/dist/httpd/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_BUGDB=	utility/apache
 COMPONENT_ANITYA_ID=	1335
 
-TPNO=	39228
+TPNO=	48876
 
 CONFIGURE_DEFAULT_DIRS=no
 TEST_TARGET= $(NO_TESTS)
-
-# Requires newer Kerberos, unavailable in 11.3
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/common.mk
 
@@ -73,8 +72,8 @@ CONFIGURE_OPTIONS +=	--enable-exception-hook
 CONFIGURE_OPTIONS +=	--enable-cgi
 CONFIGURE_OPTIONS +=	--enable-suexec
 CONFIGURE_OPTIONS +=	--with-suexec-caller=webservd
-CONFIGURE_OPTIONS +=	--with-apr=$(USRDIR)/apr/1.5/bin/$(MACH64)/apr-1-config
-CONFIGURE_OPTIONS +=	--with-apr-util=$(USRDIR)/apr-util/1.5/bin/$(MACH64)/apu-1-config
+CONFIGURE_OPTIONS +=	--with-apr=$(USRDIR)/apr/1.6/bin/$(MACH64)/apr-1-config
+CONFIGURE_OPTIONS +=	--with-apr-util=$(USRDIR)/apr-util/1.6/bin/$(MACH64)/apu-1-config
 CONFIGURE_OPTIONS +=	CFLAGS="$(CFLAGS)"
 CONFIGURE_OPTIONS +=	LTFLAGS="--silent --tag=CC"
 
@@ -86,11 +85,11 @@ endif
 
 COMPONENT_POST_INSTALL_ACTION += ($(KSH93) Solaris/customization.sh $(PROTO_DIR))
 
-REQUIRED_PACKAGES += library/apr-15
-REQUIRED_PACKAGES += library/apr-util-15
-REQUIRED_PACKAGES += library/apr-util-15/apr-ldap
-REQUIRED_PACKAGES += library/apr-util-15/dbd-mysql
-REQUIRED_PACKAGES += library/apr-util-15/dbd-sqlite
+REQUIRED_PACKAGES += library/apr-16
+REQUIRED_PACKAGES += library/apr-util-16
+REQUIRED_PACKAGES += library/apr-util-16/apr-ldap
+REQUIRED_PACKAGES += library/apr-util-16/dbd-mysql
+REQUIRED_PACKAGES += library/apr-util-16/dbd-sqlite
 REQUIRED_PACKAGES += library/libxml2
 REQUIRED_PACKAGES += library/nghttp2
 REQUIRED_PACKAGES += library/pcre

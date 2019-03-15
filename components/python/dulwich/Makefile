@@ -20,23 +20,23 @@
 #
 
 #
-# Copyright (c) 2016, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		dulwich
-COMPONENT_VERSION=	0.16.3
+COMPONENT_VERSION=	0.19.2
 COMPONENT_SRC=		$(COMPONENT_NAME)-$(COMPONENT_VERSION)
 COMPONENT_ARCHIVE=	$(COMPONENT_SRC).tar.gz
 COMPONENT_ARCHIVE_HASH=	\
-    sha256:9a2a03e131e5dc5efdf61119b6c16558b202528cca220b6b1e7cb0e7fe3e843a
+    sha256:c51e10c260543240e0806052af046e1a78b98cbe1ac1ef3880a78d2269e09da4
 COMPONENT_ARCHIVE_URL=	$(call pypi_url)
 COMPONENT_PROJECT_URL=	https://www.dulwich.io/
 COMPONENT_BUGDB=	python-mod/dulwich
-COMPONENT_PROJECT_ANITYA_ID=	6077
+COMPONENT_ANITYA_ID=	6077
 
-TPNO=			33783
+TPNO=			43216
 
 include $(WS_MAKE_RULES)/prep.mk
 include $(WS_MAKE_RULES)/setup.py.mk
@@ -49,3 +49,7 @@ build:		$(BUILD_32_and_64)
 install:	$(INSTALL_32_and_64)
 test:		$(TEST_32_and_64)
 system-test:    $(SYSTEM_TESTS_NOT_IMPLEMENTED)
+
+REQUIRED_PACKAGES += library/python/urllib3-27
+REQUIRED_PACKAGES += library/python/urllib3-34
+REQUIRED_PACKAGES += library/python/urllib3-35

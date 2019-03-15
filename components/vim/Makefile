@@ -20,15 +20,16 @@
 #
 
 #
-# Copyright (c) 2011, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 BUILD_BITS= 64
+COMPILER= gcc
 include ../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		vim
-COMPONENT_VERSION=	8.0
+COMPONENT_VERSION=	8.1
 COMPONENT_FULL_VERSION=	$(shell echo $(GIT_TAG) | sed -e 's/v//')
-IPS_COMPONENT_VERSION=	$(shell echo $(GIT_TAG) | sed -e 's/v//' -e 's/\.0*\([1-9]\)/.\1/')
+IPS_COMPONENT_VERSION=	$(shell echo $(GIT_TAG) | perl -pe 's/v(8\.1\.)0?(\d+)/\1\2/')
 COMPONENT_LABEL=	$(COMPONENT_FULL_VERSION)
 # COMPONENT_SRC* is autodefined by the prep-{SCM} Makefile fragment
 COMPONENT_ARCHIVE=	$(COMPONENT_SRC).tar.bz2
@@ -36,11 +37,11 @@ COMPONENT_PROJECT_URL=	http://www.vim.org/
 COMPONENT_ANITYA_ID=	5092
 
 GIT_REPO=		https://github.com/vim/vim
-GIT_TAG=		v8.0.0711
-GIT_COMMIT_ID=		85dad2c81
-GIT_HASH=		sha256:2f1c1483e7699224a5d1e18d39c5596101787dfcb74138589d4c8c19591b52f3
+GIT_TAG=		v8.1.0209
+GIT_COMMIT_ID=		b6c8cd8dc
+GIT_HASH=		sha256:dbd725e76b869815638745eb65c97058ca7ceb57ebb3dddbcec401f1a74cc9df
 
-TPNO=			36600
+TPNO=			44428
 
 PKG_MACROS +=	VIMVER=vim$(subst .,,$(COMPONENT_VERSION))
 
@@ -58,11 +59,7 @@ TEST_64 = 	$(NOX_VARIANT)/.tested
 
 include $(WS_MAKE_RULES)/common.mk
 
-# Studio 12.3 and 12.4 allow unknown __attribute__s, but complain about them,
-# making the build pretty loud about unknown "unused" attributes.  If we make
-# it an error, configure will turn off its use.  See bug 20230791.
-CFLAGS +=		-errwarn=E_ATTRIBUTE_UNKNOWN
-studio_C99MODE =	$(studio_C99_ENABLE)
+CFLAGS += -std=gnu99
 
 # Make sure we use a 64-bit, multithreaded perl
 CONFIGURE_ENV +=	vi_cv_path_perl=/usr/perl5/5.22/bin/perl
@@ -72,7 +69,6 @@ CONFIGURE_ENV +=	vi_cv_path_python3=/usr/bin/python3.5
 CONFIGURE_ENV +=	MSGFMT=gmsgfmt
 CONFIGURE_ENV +=	SOURCE_DATE_EPOCH=$(SOURCE_DATE_EPOCH)
 
-CONFIGURE_OPTIONS +=	LDFLAGS="$(studio_C99MODE)"
 CONFIGURE_OPTIONS +=	--with-features=huge
 CONFIGURE_OPTIONS +=	--with-compiledby="the Solaris Userland build environment"
 CONFIGURE_OPTIONS +=	--with-modified-by="Solaris Userland Team"
@@ -119,7 +115,7 @@ REQUIRED_PACKAGES += runtime/lua
 REQUIRED_PACKAGES += runtime/perl-522
 REQUIRED_PACKAGES += runtime/python-27
 REQUIRED_PACKAGES += runtime/python-35
-REQUIRED_PACKAGES += runtime/ruby-21
+REQUIRED_PACKAGES += runtime/ruby-25
 REQUIRED_PACKAGES += shell/ksh93
 REQUIRED_PACKAGES += system/library/math
 REQUIRED_PACKAGES += text/gnu-gettext

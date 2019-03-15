@@ -19,7 +19,7 @@
 # CDDL HEADER END
 
 #
-# Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2016, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS=		64_and_32
@@ -29,7 +29,7 @@ include ../../make-rules/shared-macros.mk
 COMPONENT_NAME=		libusb
 COMPONENT_VERSION=     1.0.21
 COMPONENT_ARCHIVE_HASH= sha256:1a5b08c05bc5e38c81c2d59c29954d5916646f4ff46f51381b3f624384e4ac01
-COMPONENT_ARCHIVE_URL=  http://sourceforge.net/projects/libusb/files/libusb-1.0/$(COMPONENT_SRC)/$(COMPONENT_ARCHIVE)
+COMPONENT_ARCHIVE_URL=  https://sourceforge.net/projects/libusb/files/libusb-1.0/$(COMPONENT_SRC)/$(COMPONENT_ARCHIVE)
 COMPONENT_PROJECT_URL=  http://libusb.info/
 COMPONENT_ANITYA_ID=	1749
 
@@ -55,3 +55,5 @@ install:	$(INSTALL_32_and_64)
 	cd $(BUILD_DIR_64); \
 	$(MKDIR) -p $(PROTOUSRSHAREDOCDIR); \
 	$(CP) -r doc/html $(PROTOUSRSHAREDOCDIR)
+
+REQUIRED_PACKAGES += system/library/devinfo

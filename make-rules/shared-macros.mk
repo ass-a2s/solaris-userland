@@ -20,13 +20,13 @@
 #
 
 #
-# Copyright (c) 2010, 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 .PHONY: void
 void:
 	@echo "Must specify target: prep, build, install, publish, test, etc."
-	@echo "See $(WS_TOP)/makefile-targets.txt for more info."
+	@echo "See $(WS_TOP)/doc/makefile-targets.txt for more info."
 
 PATH=/usr/bin:/usr/gnu/bin
 
@@ -35,7 +35,7 @@ PATH=/usr/bin:/usr/gnu/bin
 # for a few components where the communities either no longer provide matching
 # source archives or we have changes that aren't reflected in their archives or
 # anywhere else.
-INTERNAL_ARCHIVE_MIRROR =	http://userland.us.oracle.com/source-archives
+INTERNAL_ARCHIVE_MIRROR ?=	http://userland.us.oracle.com/source-archives
 
 # The location of an external mirror of community source archives that we build
 # in this gate.  The external mirror is a replica of the internal mirror.
@@ -93,22 +93,59 @@ export HOME=$(WS_HOME)
 SHELL=	/bin/bash
 ID=	/usr/bin/id
 # We want "nightly" as our publisher, to match other consolidations and
-# facilitate migrations (except for evaluation builds, which need to use
-# "solaris" as the publisher).  G11N wants $(CONSOLIDATION)-localizable for
-# the localizable publisher.
+# facilitate migrations. G11N wants $(CONSOLIDATION)-localizable for the
+# localizable publisher.
 CONSOLIDATION =	userland
-ifeq ($(BUILD_TYPE),evaluation)
-PUBLISHER ?=	solaris
-else
 PUBLISHER ?=	nightly
-endif
 PUBLISHER_LOCALIZABLE ?=	$(CONSOLIDATION)-localizable
 
 # Defines $(space) as a single blank space, so we can use it to convert
 # space-separated paths to colon-separated paths in variables with
 # $(subst $(space),:,$(strip $(SPATHS)))
 empty :=
+quot  := "
+bkslash  := \$(empty)
 space := $(empty) $(empty)
+define newline
+
+
+endef
+
+# Change \ -> \\
+define prepare_env_args_slash
+$(subst $(bkslash),$(bkslash)$(bkslash),$(1))
+endef
+
+# Change $ -> \$
+define prepare_env_args_dollar
+$(subst $$,$(bkslash)$$,$(call prepare_env_args_slash,$(1)))
+endef
+
+# Change " -> \"
+define prepare_env_args_quote
+$(subst $(quot),$(bkslash)$(quot),$(call prepare_env_args_dollar,$(1)))
+endef
+
+# Change \n -> "$'\n'"
+define prepare_env_args_newline
+$(subst $(newline),$(quot)$$'$(bkslash)n'$(quot),$(call prepare_env_args_quote,$(1)))
+endef
+
+
+# Modify all the arguments to a form directly passable to the env(1) command.
+# The arguments are encapsulated in double quotes and several characters are
+# replaced as follows:
+#         \ -> \\
+#         " -> \"
+#         $ -> \$
+# <newline> -> "$'\n'"
+#
+# It is intended to be used as
+#     env $(call prepare_env_args,VAR1 VAR2) process
+# and process will get VAR1 and VAR2 in it's environment.
+define prepare_env_args
+$(foreach env,$(1),"$(env)=$(call prepare_env_args_newline,$($(env)))")
+endef
 
 ROOT =			/
 
@@ -125,26 +162,35 @@ OS_SUB_VERS_MINOR =	$(word 1, $(OS_SUB_VERS_2))
 OS_SUB_VERS_MICRO =	$(word 2, $(OS_SUB_VERS_2))
 OS_VERSION ?=		$(OS_SUB_VERS_MINOR).$(OS_SUB_VERS_MICRO)
 
-# We generally build the default branch on the latest release.  But for
-# the FOSS evaluation repo project, we build on the previous release.
-# Add macros to make that easier.  Note: what started out as Solaris 12
-# later became 11.4, which is why SOLARIS_11_4_ONLY is set when OS_RELEASE
-# is "5.12".
-ifeq ($(OS_RELEASE),5.12)
-SOLARIS_11_4_ONLY =
+# Define limiting variables. These allow you to write single makefile or p5m
+# manifest which can be used on multiple solaris releases even though their
+# contents differs
+ifeq ($(OS_VERSION),11.5)
 SOLARIS_11_3_ONLY =\#
-else
-ifeq ($(OS_VERSION),11.4)
-SOLARIS_11_4_ONLY =
-SOLARIS_11_3_ONLY =\#
-else
-ifeq ($(OS_VERSION),11.3)
 SOLARIS_11_4_ONLY =\#
+SOLARIS_11_5_ONLY =
+SOLARIS_11_3_4_ONLY =\#
+SOLARIS_11_4_5_ONLY =
+endif
+
+ifeq ($(OS_VERSION),11.4)
+SOLARIS_11_3_ONLY =\#
+SOLARIS_11_4_ONLY =
+SOLARIS_11_5_ONLY =\#
+SOLARIS_11_3_4_ONLY =
+SOLARIS_11_4_5_ONLY =
+endif
+
+ifeq ($(OS_VERSION),11.3)
 SOLARIS_11_3_ONLY =
-else
-$(error Unknown OS version "$(OS_VERSION)"; set OS_VERSION to "11.3" or "11.4")
+SOLARIS_11_4_ONLY =\#
+SOLARIS_11_5_ONLY =\#
+SOLARIS_11_3_4_ONLY =
+SOLARIS_11_4_5_ONLY =\#
 endif
-endif
+
+ifeq ($(strip $(SOLARIS_11_3_ONLY)$(SOLARIS_11_4_ONLY)$(SOLARIS_11_5_ONLY)),)
+$(error Unknown OS version "$(OS_VERSION)"; set OS_VERSION to "11.3" or "11.4" or "11.5")
 endif
 
 include $(WS_MAKE_RULES)/ips-buildinfo.mk
@@ -196,7 +242,24 @@ PYTHON2_VERSIONS =	2.7
 PYTHON3_VERSIONS =	3.4 3.5
 PYTHON_VERSIONS =	$(PYTHON3_VERSIONS) $(PYTHON2_VERSIONS)
 
+# PYTHON3_SOABI variable defines the naming scheme
+# of python3 extension libraries: cpython or abi3.
+# Currently, most of the components use cpython naming scheme by default,
+# only python/xattr and python/cryptography require abi3 naming.
+PYTHON3_SOABI ?= cpython
+ifeq ($(PYTHON3_SOABI),cpython)
+PY3_CYTHON_NAMING=
+PY3_ABI3_NAMING=\#
+else ifeq ($(PYTHON3_SOABI),abi3)
+PY3_CYTHON_NAMING=\#
+PY3_ABI3_NAMING=
+else
+$(error "Invalid python naming scheme '$(PYTHON3_SOABI)' selected!")
+endif
+
 BASS_O_MATIC =	$(WS_TOOLS)/bass-o-matic
+MANIFEST_GENERATE = $(WS_TOOLS)/manifest-generate
+MANIFEST_COMPARE = $(WS_TOOLS)/manifest-check
 
 CLONEY =	$(WS_TOOLS)/cloney
 
@@ -288,6 +351,8 @@ CONSTANT_TIME +=	TIME_CONSTANT=$(TIME_CONSTANT)
 
 # set MACH from uname -p to either sparc or i386
 MACH :=		$(shell uname -p)
+# Override this to limit builds and publication to a single architecture.
+BUILD_ARCH ?=	$(MACH)
 
 # set MACH32 from MACH to either sparcv7 or i86
 MACH32_1 =	$(MACH:sparc=sparcv7)
@@ -494,12 +559,12 @@ $(BUILD_DIR_32) $(BUILD_DIR_64):
 	$(MKDIR) $(@)
 
 # BUILD_TOOLS is the root of all tools not normally installed on the system.
-BUILD_TOOLS ?=	/ws/on12-tools
+BUILD_TOOLS ?=	/opt
 
-SPRO_ROOT ?=	$(BUILD_TOOLS)/SUNWspro
+SPRO_ROOT ?=	$(BUILD_TOOLS)
 SPRO_VROOT ?=	$(SPRO_ROOT)/solarisstudio12.4
 
-PARFAIT_ROOT =	$(BUILD_TOOLS)/parfait/parfait-tools-1.9.4
+PARFAIT_ROOT =	$(BUILD_TOOLS)/parfait/parfait-tools-2.1.0
 PARFAIT_TOOLS=	$(WS_TOOLS)/$(MACH)/parfait
 PARFAIT= $(PARFAIT_ROOT)/bin/parfait
 export PARFAIT_NATIVESUNCC=$(SPRO_VROOT)/bin/cc
@@ -547,15 +612,15 @@ endif
 CC =		$(CC.$(COMPILER).$(BITS))
 CXX =		$(CXX.$(COMPILER).$(BITS))
 
-RUBY_VERSION =	2.1
-RUBY_LIB_VERSION =	2.1.0
+RUBY_VERSION =	2.5
+RUBY_PUPPET_VERSION = 2.5
+
+# The default version should go last.
+RUBY_VERSIONS = 2.1 2.3 2.5
 RUBY.2.1 =	/usr/ruby/2.1/bin/ruby
 RUBY.2.3 =	/usr/ruby/2.3/bin/ruby
+RUBY.2.5 =	/usr/ruby/2.5/bin/ruby
 RUBY =		$(RUBY.$(RUBY_VERSION))
-# Use the ruby lib versions to represent the RUBY_VERSIONS that
-# need to get built.  This is done because during package transformations
-# both the ruby version and the ruby library version are needed. 
-RUBY_VERSIONS = $(RUBY_LIB_VERSION)
 
 # Transform Ruby scripts to call the supported
 # version-specific ruby; used in multiple *.mk files
@@ -607,6 +672,10 @@ PYTHON.3.5.32 =	$(USRBIN.32)/python3.5
 PYTHON.3.5.64 =	$(USRBIN.32)/python3.5
 PYTHON.3.5 =	$(USRBIN.32)/python3.5
 
+PYTHON.3.7.32 =	$(USRBIN.32)/python3.7
+PYTHON.3.7.64 =	$(USRBIN.32)/python3.7
+PYTHON.3.7 =	$(USRBIN.32)/python3.7
+
 PYTHON.32 =	$(PYTHON.$(PYTHON_VERSION).32)
 PYTHON.64 =	$(PYTHON.$(PYTHON_VERSION).64)
 PYTHON =	$(PYTHON.$(PYTHON_VERSION).$(BITS))
@@ -630,6 +699,7 @@ PYTHON_SCRIPT_SHEBANG_FIX_FUNC = \
 		-e '1s@/usr/bin/python$$@$(PYTHON)@' \
 		-e '1s@/usr/bin/python\ @$(PYTHON) @' \
 		-e '1s@/usr/bin/env\ $(PYTHON)@$(PYTHON)@' \
+		-e '1s@/usr/bin/env\ python[23]@$(PYTHON)@' \
 		-e '1s@/usr/bin/env\ python@$(PYTHON)@' $(1);
 
 # PYTHON_SCRIPTS is a list of files from the calling Makefile.
@@ -655,9 +725,19 @@ PERL_VERSION_NODOT = $(subst .,,$(PERL_VERSION))
 # multiple packages for each version of perl listed here.  Used by
 # perl_modules/* but also used for those components that deliver a perl
 # package like graphviz and openscap.
-PERL_VERSIONS = 5.22
+PERL_VERSIONS = 5.22 5.26
 
 PERL.5.22 =     /usr/perl5/5.22/bin/perl
+PERL.5.26 =     /usr/perl5/5.26/bin/perl
+
+define test-perl-availability
+TEST_PERL_PATH=$$(PERL.$(1))
+ifeq ($$(strip $$(TEST_PERL_PATH)),)
+$$(error variable PERL.$(1) is not defined)
+endif
+endef
+
+$(foreach p,$(PERL_VERSIONS),$(eval $(call test-perl-availability,$(p))))
 
 # Use these in a component's Makefile for building and packaging with the
 # BUILD's default perl and the package it comes from.
@@ -706,10 +786,10 @@ COMPONENT_POST_INSTALL_ACTION += $(PERL_SCRIPTS_PROCESS)
 PHP_TOP_DIR = $(WS_COMPONENTS)/php
 
 # All versions of PHP for building extension packages.
-PHP_VERSIONS = 5.6 7.1
+PHP_VERSIONS = 7.1 7.3
 
-PHP.5.6 = /usr/php/5.6/bin/php
 PHP.7.1 = /usr/php/7.1/bin/php
+PHP.7.3 = /usr/php/7.3/bin/php
 
 # This is the default BUILD version of tcl
 # Not necessarily the system's default version, i.e. /usr/bin/tclsh
@@ -764,6 +844,8 @@ CHMOD =		/usr/bin/chmod
 NAWK =		/usr/bin/nawk
 TAR =		/usr/bin/tar
 TEE =		/usr/bin/tee
+ANT =		/usr/bin/ant
+LOCALEDEF =	/usr/bin/localedef
 
 INS.dir=        $(INSTALL) -d $@
 INS.file=       $(INSTALL) -m 444 $< $(@D)
@@ -790,7 +872,7 @@ LIBXNET=$(shell elfdump -d /usr/lib/libxnet.so.1 | $(NAWK) 'BEGIN {ret="-lxnet"}
 # C preprocessor flag sets to ease feature selection.  Add the required
 # feature to your Makefile with CPPFLAGS += $(FEATURE_MACRO) and add to
 # the component build with CONFIGURE_OPTIONS += CPPFLAGS="$(CPPFLAGS)" or
-# similiar.
+# similar.
 #
 
 # Enables visibility of some c99 math functions that aren't visible by default.
@@ -822,7 +904,7 @@ CPP_XPG5MODE=   -D_XOPEN_SOURCE=500 -D__EXTENSIONS__=1 -D_XPG5
 #
 # Studio C compiler flag sets to ease feature selection.  Add the required
 # feature to your Makefile with CFLAGS += $(FEATURE_MACRO) and add to the
-# component build with CONFIGURE_OPTIONS += CFLAGS="$(CFLAGS)" or similiar.
+# component build with CONFIGURE_OPTIONS += CFLAGS="$(CFLAGS)" or similar.
 #
 
 # Generate 32/64 bit objects
@@ -925,7 +1007,7 @@ XPG5MODE =		$(studio_XPG5MODE)
 
 # Default Studio C compiler flags.  Add the required feature to your Makefile
 # with CFLAGS += $(FEATURE_MACRO) and add to the component build with
-# CONFIGURE_OPTIONS += CFLAGS="$(CFLAGS)" or similiar.  In most cases, it
+# CONFIGURE_OPTIONS += CFLAGS="$(CFLAGS)" or similar.  In most cases, it
 # should not be necessary to add CFLAGS to any environment other than the
 # configure environment.
 CFLAGS.studio +=	$(studio_OPT) $(studio_XBITS) $(studio_XREGS) \
@@ -934,7 +1016,7 @@ CFLAGS.studio +=	$(studio_OPT) $(studio_XBITS) $(studio_XREGS) \
 
 # Default Studio C++ compiler flags.  Add the required feature to your Makefile
 # with CXXFLAGS += $(FEATURE_MACRO) and add to the component build with
-# CONFIGURE_OPTIONS += CXXFLAGS="$(CXXFLAGS)" or similiar.  In most cases, it
+# CONFIGURE_OPTIONS += CXXFLAGS="$(CXXFLAGS)" or similar.  In most cases, it
 # should not be necessary to add CXXFLAGS to any environment other than the
 # configure environment.
 CXXFLAGS.studio +=	$(studio_OPT) $(studio_XBITS) $(studio_XREGS) \
@@ -943,7 +1025,7 @@ CXXFLAGS.studio +=	$(studio_OPT) $(studio_XBITS) $(studio_XREGS) \
 #
 # GNU C compiler flag sets to ease feature selection.  Add the required
 # feature to your Makefile with CFLAGS += $(FEATURE_MACRO) and add to the
-# component build with CONFIGURE_OPTIONS += CFLAGS="$(CFLAGS)" or similiar.
+# component build with CONFIGURE_OPTIONS += CFLAGS="$(CFLAGS)" or similar.
 #
 
 # gcc defaults to assuming stacks are 8 byte aligned on x86, but some
@@ -973,7 +1055,7 @@ CC_PIC_MODE =		$(CC_PIC_DISABLE)
 
 # Default GNU C compiler flags.  Add the required feature to your Makefile
 # with CFLAGS += $(FEATURE_MACRO) and add to the component build with
-# CONFIGURE_OPTIONS += CFLAGS="$(CFLAGS)" or similiar.  In most cases, it
+# CONFIGURE_OPTIONS += CFLAGS="$(CFLAGS)" or similar.  In most cases, it
 # should not be necessary to add CFLAGS to any environment other than the
 # configure environment.
 CFLAGS.gcc +=	$(gcc_OPT)
@@ -981,7 +1063,7 @@ CFLAGS.gcc +=	$(gcc_XREGS)
 
 # Default GNU C++ compiler flags.  Add the required feature to your Makefile
 # with CXXFLAGS += $(FEATURE_MACRO) and add to the component build with
-# CONFIGURE_OPTIONS += CXXFLAGS="$(CXXFLAGS)" or similiar.  In most cases, it
+# CONFIGURE_OPTIONS += CXXFLAGS="$(CXXFLAGS)" or similar.  In most cases, it
 # should not be necessary to add CXXFLAGS to any environment other than the
 # configure environment.
 CXXFLAGS.gcc +=		$(gcc_OPT)
@@ -1037,7 +1119,7 @@ CXXFLAGS +=	$(CXXFLAGS.$(MACH))
 #
 # Solaris linker flag sets to ease feature selection.  Add the required
 # feature to your Makefile with LDFLAGS += $(FEATURE_MACRO) and add to the
-# component build with CONFIGURE_OPTIONS += LDFLAGS="$(LDFLAGS)" or similiar.
+# component build with CONFIGURE_OPTIONS += LDFLAGS="$(LDFLAGS)" or similar.
 #
 
 # set the bittedness that we want to link
@@ -1119,6 +1201,9 @@ ADISTACK_ENABLE.sparcv9 =	-zsx=adistack=enable
 ADISTACK_DISABLE.sparcv9 =	-zsx=adistack=disable
 ADISTACK_ENABLE =		$(ADISTACK_ENABLE.$(MACH64))
 ADISTACK_DISABLE =		$(ADISTACK_DISABLE.$(MACH64))
+
+SSBD_ENABLE =			-zsx=ssbd=enable
+SSBD_DISABLE =			-zsx=ssbd=disable
 endif
  
 # Enable ASLR, NXHEAP and NXSTACK by default unless target build is NO_ARCH.
@@ -1221,7 +1306,7 @@ COMPONENT_INSTALL_ARGS += $(COMPONENT_INSTALL_ARGS.$(BITS))
 
 # declare these phony so that we avoid filesystem conflicts.
 .PHONY:	prep build install publish test system-test clean clobber parfait \
-	check_rtime
+	check_rtime check_anitya
 
 # If there are no tests to execute
 NO_TESTS =	test-nothing
@@ -1267,6 +1352,30 @@ COMPONENT_HOOK ?=	echo $(COMPONENT_NAME) $(COMPONENT_VERSION)
 component-hook:
 	@$(COMPONENT_HOOK)
 
+# Display current information about a component from the Antiya database
+# at https://release-monitoring.org/
+ifneq ($(COMPONENT_DIR),$(WS_COMPONENTS))
+ANITYA_SUFFIXES = $(subst COMPONENT_ANITYA_ID_,, $(filter COMPONENT_ANITYA_ID_%, $(.VARIABLES)))
+ANITYA_API_URL = https://release-monitoring.org/api/project
+
+define anitya-recipe
+	@ print '# $(COMPONENT_NAME$(1)) $(COMPONENT_VERSION$(1))'
+	@ print '# $(COMPONENT_PROJECT_URL$(1))'
+	@ if [[ -n "$(COMPONENT_ANITYA_ID$(1):N/A=)" ]] ; then \
+		curl -s $(ANITYA_API_URL)/$(COMPONENT_ANITYA_ID$(1)) ; \
+		print ; \
+	else \
+		print '# COMPONENT_ANITYA_ID$(1) = $(COMPONENT_ANITYA_ID$(1))' ;\
+	fi
+
+endef
+
+check_anitya:
+	$(call anitya-recipe,)
+	$(foreach suffix, $(ANITYA_SUFFIXES), \
+		$(call anitya-recipe,_$(suffix)))
+endif
+
 CLEAN_PATHS +=	$(BUILD_DIR)
 CLOBBER_PATHS +=	$(PROTO_DIR)
 
@@ -1306,6 +1415,7 @@ REQUIRED_PACKAGES += security/sudo
 # Only a default dependency if component being built produces binaries.
 ifneq ($(strip $(BUILD_BITS)),NO_ARCH)
 REQUIRED_PACKAGES += system/library
+REQUIRED_PACKAGES += system/library/libc
 endif
 
 include $(WS_MAKE_RULES)/environment.mk

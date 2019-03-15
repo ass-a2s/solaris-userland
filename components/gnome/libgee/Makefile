@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            64_and_32
@@ -31,19 +31,13 @@ include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		libgee
 COMPONENT_VERSION=	0.20.0
+COMPONENT_PROJECT_URL=	https://wiki.gnome.org/Projects/Libgee
 COMPONENT_ARCHIVE_HASH=	\
 	sha256:21308ba3ed77646dda2e724c0e8d5a2f8d101fb05e078975a532d7887223c2bb
 COMPONENT_BUGDB=        gnome/libraries
 COMPONENT_ANITYA_ID=	1625
 
 TPNO=			34500
-
-# Needs updated glib2, not available on S11.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_32_and_64=
-INSTALL_32_and_64=
-PUBLISH_STAMP=
-endif
 
 include $(WS_MAKE_RULES)/gnome-component.mk
 

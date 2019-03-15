@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2015, 2016, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 #
@@ -28,10 +28,12 @@
 # userland components.
 #
 
+ifeq ($(strip $(BUILD_STYLE)),cargo)
+include $(WS_MAKE_RULES)/cargo-vendored.mk
+endif
+
 include $(WS_MAKE_RULES)/prep.mk
 
-# Override this to limit builds and publication to a single architecture.
-BUILD_ARCH ?= $(MACH)
 ifneq ($(strip $(BUILD_ARCH)),$(MACH))
 PUBLISH_STAMP= 
 
@@ -106,6 +108,9 @@ ifneq ($(strip $(LINT_LIBRARIES)),)
 include $(WS_MAKE_RULES)/lint-libraries.mk
 endif
 
+# Always needed; every component builds packages.
+include $(WS_MAKE_RULES)/ips.mk
+
 # Default targets; to omit a specific target, explicitly set the related target
 # variable to empty before including this file or set COMMON_TARGETS=no.
 COMMON_TARGETS ?= yes
@@ -155,6 +160,7 @@ build:          $(BUILD_TARGET)
 endif
 
 INSTALL_TARGET ?= $(INSTALL_$(MK_BITS))
+INSTALL_TARGET += $(MANGLED)
 ifneq ($(strip $(INSTALL_TARGET)),)
 install:        $(INSTALL_TARGET)
 endif
@@ -170,9 +176,6 @@ ifneq ($(strip $(SYSTEM_TEST_TARGET)),)
 system-test:    $(SYSTEM_TEST_TARGET)
 endif
 endif # COMMON_TARGETS
-
-# Always needed; every component builds packages.
-include $(WS_MAKE_RULES)/ips.mk
 
 # Determine if we should automatically add files directory to PKG_PROTO_DIRS.
 ifeq ($(wildcard files),files)

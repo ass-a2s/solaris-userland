@@ -20,28 +20,31 @@
 #
 
 #
-# Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2018, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            64_and_32
 include ../../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		libxcb
-COMPONENT_VERSION=	1.12
+COMPONENT_VERSION=	1.13.1
 COMPONENT_CATEGORY=	xcb
+COMPONENT_PROJECT_URL=	https://xcb.freedesktop.org/
 COMPONENT_ARCHIVE_HASH= \
-	sha256:4adfb1b7c67e99bc9c2ccb110b2f175686576d2f792c8a71b9c8b19014057b5b
+	sha256:a89fb7af7a11f43d2ce84a844a4b38df688c092bf4b67683aef179cdf2a647c4
 COMPONENT_BUGDB=        x11/libraries
 COMPONENT_ANITYA_ID=	1767
+TPNO=			49914
 
 COMPONENT_NAME_1=	xcb-proto
-COMPONENT_VERSION_1=	1.12
+COMPONENT_VERSION_1=	1.13
 COMPONENT_SRC_1=	$(COMPONENT_NAME_1)-$(COMPONENT_VERSION_1)
 COMPONENT_ARCHIVE_1=	$(COMPONENT_SRC_1).tar.bz2
-COMPONENT_ARCHIVE_URL_1=$(COMPONENT_PROJECT_URL)/releases/individual/$(COMPONENT_CATEGORY)/$(COMPONENT_ARCHIVE_1)
+COMPONENT_ARCHIVE_URL_1=$(COMPONENT_PROJECT_URL)/dist/$(COMPONENT_ARCHIVE_1)
 COMPONENT_ARCHIVE_HASH_1= \
-        sha256:5922aba4c664ab7899a29d92ea91a87aa4c1fc7eb5ee550325c3216c480a4906
-COMPONENT_ANITYA_ID_1=    13646
+        sha256:7b98721e669be80284e9bbfeab02d2d0d54cd11172b72271e47a2fe875e2bde1
+COMPONENT_ANITYA_ID_1=  13646
+TPNO_1=			49165
 
 TEST_TARGET = $(NO_TESTS)
 
@@ -102,5 +105,10 @@ COMPONENT_POST_INSTALL_ACTION.64 += \
 	$(INSTALL) -m 0444 $(BUILD_DIR_64)/src/man/*.3xcb \
 		$(PROTO_DIR)/usr/share/man/man3xcb/ ;
 
+REQUIRED_PACKAGES += developer/documentation-tool/doxygen
+REQUIRED_PACKAGES += image/graphviz
+# xcb-proto runs xmllint
+REQUIRED_PACKAGES += library/libxml2
+REQUIRED_PACKAGES += runtime/python-34
 REQUIRED_PACKAGES += x11/library/libxau
 REQUIRED_PACKAGES += x11/library/libxdmcp

@@ -39,7 +39,7 @@ set name=pkg.fmri \
     value=pkg:/web/java-servlet/tomcat-8@$(IPS_COMPONENT_VERSION),$(BUILD_VERSION)
 set name=pkg.summary value="Tomcat Servlet/JSP Container"
 set name=com.oracle.info.description value="the Tomcat Servlet/JSP Container"
-set name=com.oracle.info.tpno value=9075
+set name=com.oracle.info.tpno value=$(TPNO)
 set name=info.classification \
     value="org.opensolaris.category.2008:Web Services/Application and Web Servers"
 set name=info.source-url value=$(COMPONENT_ARCHIVE_URL)
@@ -153,8 +153,11 @@ file path=usr/tomcat8/docs/funcspecs/fs-jndi-realm.html
 file path=usr/tomcat8/docs/funcspecs/fs-memory-realm.html
 file path=usr/tomcat8/docs/funcspecs/index.html
 file path=usr/tomcat8/docs/funcspecs/mbean-names.html
+file path=usr/tomcat8/docs/host-manager-howto.html
+file path=usr/tomcat8/docs/html-host-manager-howto.html
 file path=usr/tomcat8/docs/html-manager-howto.html
 file path=usr/tomcat8/docs/images/add.gif
+file path=usr/tomcat8/docs/images/asf-logo.svg
 file path=usr/tomcat8/docs/images/code.gif
 file path=usr/tomcat8/docs/images/cors-flowchart.png
 file path=usr/tomcat8/docs/images/design.gif
@@ -228,6 +231,7 @@ file path=usr/tomcat8/lib/tomcat-dbcp.jar
 file path=usr/tomcat8/lib/tomcat-i18n-es.jar
 file path=usr/tomcat8/lib/tomcat-i18n-fr.jar
 file path=usr/tomcat8/lib/tomcat-i18n-ja.jar
+file path=usr/tomcat8/lib/tomcat-i18n-ru.jar
 file path=usr/tomcat8/lib/tomcat-jdbc.jar
 file path=usr/tomcat8/lib/tomcat-jni.jar
 file path=usr/tomcat8/lib/tomcat-util-scan.jar

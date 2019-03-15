@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2016, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS=		64
@@ -37,9 +37,6 @@ COMPONENT_ANITYA_ID=	10896
 
 TPNO=			25405
 
-# Needs newer intltool, not available in 11.3
-include $(WS_MAKE_RULES)/no-evaluation.mk
-
 include $(WS_MAKE_RULES)/gnome-component.mk
 
 # Need to regenerate configure after stack-protector.patch edits configure.ac
@@ -50,12 +47,7 @@ COMPONENT_BUILD_ENV += PATH="$(GNUBIN):$(PATH)"
 
 CONFIGURE_OPTIONS += --libexecdir=$(USRLIBDIR)
 
-# Force use of gnutls-3 pkgconfig during 2.x->3.x transition
-PKG_CONFIG_PATHS.32 += /usr/lib/pkgconfig/gnutls-3
-PKG_CONFIG_PATHS.64 += /usr/lib/$(MACH64)/pkgconfig/gnutls-3
 PKG_CONFIG_PATHS += $(PKG_CONFIG_PATHS.$(BITS))
-LD_OPTIONS.32 += -L /usr/lib/gnutls-3 -R /usr/lib/gnutls-3
-LD_OPTIONS.64 += -L /usr/lib/$(MACH64)/gnutls-3 -R /usr/lib/$(MACH64)/gnutls-3
 LD_OPTIONS += $(LD_OPTIONS.$(BITS))
 
 # uuid detection fails due to Solaris bug 15586738, use local uuid.pc to avoid
@@ -79,6 +71,7 @@ REQUIRED_PACKAGES += library/desktop/pango
 REQUIRED_PACKAGES += library/glib2
 REQUIRED_PACKAGES += library/gnome/dconf
 REQUIRED_PACKAGES += library/gnome/vte3
+REQUIRED_PACKAGES += library/gnutls-3
 REQUIRED_PACKAGES += system/library/gcc/gcc-c-runtime
 REQUIRED_PACKAGES += system/library/math
 REQUIRED_PACKAGES += x11/library/libx11

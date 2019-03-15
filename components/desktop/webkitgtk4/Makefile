@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 # parfait is a bit unhappy (24796572)
@@ -32,47 +32,47 @@ BUILD_BITS= 64
 COMPILER= gcc
 include ../../../make-rules/shared-macros.mk
 
-# gcc7 issue - error: 'std::function' has not been declared
-GCC_ROOT = /usr/gcc/5
-
 COMPONENT_NAME=		webkitgtk
-COMPONENT_VERSION=	2.8.4
-COMPONENT_PROJECT_URL=	http://webkitgtk.org
+COMPONENT_VERSION=	2.22.5
+COMPONENT_PROJECT_URL=	https://webkitgtk.org
 COMPONENT_ARCHIVE=	$(COMPONENT_SRC).tar.xz
 COMPONENT_ARCHIVE_HASH= \
-	sha256:30bd366bd970d4bac2f9ef5bff0fb935376bf91ea2aaa2a5183fe5fdbec20fbd
-COMPONENT_ARCHIVE_URL=	http://webkitgtk.org/releases/$(COMPONENT_ARCHIVE)
+	sha256:99d3863f418a7c3a3e37e5062950dbf2d91fb106ec1633459b0ef6f2d5f6cb13
+COMPONENT_ARCHIVE_URL=	https://webkitgtk.org/releases/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_BUGDB=	library/webkitgtk
 COMPONENT_ANITYA_ID=	5355
 
-TPNO=			25892
+TPNO=			48118
 
 # Use project's own optimization flags instead.
 gcc_OPT=
 
-# Requires newer version of cairo, available in S12 but not 11.3,
-# so do not publish.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_64=
-INSTALL_64=
-PUBLISH_STAMP=
-endif
-
 # We don't have JHbuild needed for tests
 TEST_TARGET= $(NO_TESTS)
 
-BUILD_STYLE= justmake
+BUILD_STYLE= cmake
+
+# Once 27639813 is figured out this can be removed along with the change
+# in prep-patch.mk for ADDITIONAL_PATCHES
+ifeq ($(MACH), sparc)
+ADDITIONAL_PATCHES += patches/mapfile.$(MACH)
+endif
+ifeq ($(MACH), i386)
+ADDITIONAL_PATCHES += patches/mapfile.$(MACH)
+endif
+
 include $(WS_MAKE_RULES)/common.mk
 
 COMPONENT_BUILD_ARGS += -j4
 
-# Force use of gnutls-3 pkgconfig during 2.x->3.x transition
-PKG_CONFIG_PATHS.32 += $(PKG_CONFIG_PATH.32)/gnutls-3
-PKG_CONFIG_PATHS.64 += $(PKG_CONFIG_PATH.64)/gnutls-3
 PKG_CONFIG_PATHS += $(PKG_CONFIG_PATHS.$(BITS))
-LD_OPTIONS.32 += -L $(USRLIB.32)/gnutls-3 -R $(USRLIB.32)/gnutls-3
-LD_OPTIONS.64 += -L $(USRLIB.64)/gnutls-3 -R $(USRLIB.64)/gnutls-3
 LD_OPTIONS += $(LD_OPTIONS.$(BITS))
+LDFLAGS +=  -Wl,-zgnu-version-script-compat
+
+# This should have avoided the need for mapfile.$(MACH) above
+# why its not working needs to be eventually figured out (27639813)
+LD_OPTIONS+=-zgnu-version-script-compat
 
 # Required to ensure expected defines are set; also, ensures project's
 # optimisation level set appropriately.  Would prefer RelWithDebInfo, but that
@@ -81,29 +81,21 @@ CMAKE_OPTIONS += -DCMAKE_BUILD_TYPE=Release
 CMAKE_OPTIONS += -DENABLE_MINIBROWSER=ON
 CMAKE_OPTIONS += -DPORT=GTK
 CMAKE_OPTIONS += -DENABLE_GLES2=OFF
+CMAKE_OPTIONS += -DUSE_GSTREAMER_GL=OFF
+CMAKE_OPTIONS += -DUSE_LIBHYPHEN=OFF
+CMAKE_OPTIONS += -DUSE_WOFF2=OFF
+CMAKE_OPTIONS += -DENABLE_SAMPLING_PROFILER=OFF
+CMAKE_OPTIONS += -DENABLE_SUBTLE_CRYPTO=OFF
+CMAKE_OPTIONS += -DENABLE_MEDIA_SOURCE=OFF
+CMAKE_OPTIONS += -DUSE_SYSTEM_MALLOC=OFF
 
-ifeq ($(MACH), sparc)
+# Disabling for both architectures for now, otherwise x64 builds fail with
+# offlineasm: No magic values found. Skipping assembly file generation.
 CMAKE_OPTIONS += -DENABLE_JIT=OFF
-endif
 
-# Need to figure out a way to use BUILD_STYLE = cmake and remove
-# these duplicate entries here - 24375155
-# This component uses cmake to generate Makefiles and so has no configure
-CMAKE           = $(shell which cmake)
-CMAKE_OPTIONS += -DCMAKE_CXX_COMPILER="$(CXX)"
-CMAKE_OPTIONS += -DCMAKE_CXX_FLAGS="$(CXXFLAGS)"
-CMAKE_OPTIONS += -DCMAKE_C_COMPILER="$(CC)"
-CMAKE_OPTIONS += -DCMAKE_C_FLAGS="$(CFLAGS)"
-CMAKE_OPTIONS += -DCMAKE_EXE_LINKER_FLAGS="$(LDFLAGS)"
-# Must start install paths with a leading '/' or files will be installed into
-# wrong location!
-CMAKE_OPTIONS += -DCMAKE_INSTALL_PREFIX="$(USRDIR)"
-CMAKE_OPTIONS += -DCMAKE_MODULE_LINKER_FLAGS="$(LDFLAGS)"
-CMAKE_OPTIONS += -DCMAKE_SHARED_LINKER_FLAGS="$(LDFLAGS)"
-CMAKE_OPTIONS += -DGETTEXT_MSGFMT_EXECUTABLE="$(GNUBIN)/msgfmt"
-CMAKE_OPTIONS += -DEXEC_INSTALL_DIR="$(USRBIN)"
 CMAKE_OPTIONS += -DLIB_INSTALL_DIR="$(USRLIB)"
 CMAKE_OPTIONS += -DLIBEXEC_INSTALL_DIR="$(USRLIB)"
+CMAKE_OPTIONS += -DEXEC_INSTALL_DIR="$(USRBIN)"
 
 # Tell g-ir-scanner not to cache results in homedir of user running the build
 COMPONENT_BUILD_ENV += GI_SCANNER_DISABLE_CACHE=""
@@ -122,7 +114,6 @@ REQUIRED_PACKAGES += database/sqlite-3
 REQUIRED_PACKAGES += developer/build/cmake
 REQUIRED_PACKAGES += developer/build/gnu-make
 REQUIRED_PACKAGES += developer/build/pkg-config
-REQUIRED_PACKAGES += developer/gcc-5
 REQUIRED_PACKAGES += developer/gperf
 REQUIRED_PACKAGES += developer/parser/bison
 REQUIRED_PACKAGES += image/library/libjpeg
@@ -156,6 +147,7 @@ REQUIRED_PACKAGES += system/library/freetype-2
 REQUIRED_PACKAGES += system/library/gcc/gcc-c++-runtime
 REQUIRED_PACKAGES += system/library/gcc/gcc-c-runtime
 REQUIRED_PACKAGES += system/library/math
+REQUIRED_PACKAGES += system/library/security/libgcrypt
 REQUIRED_PACKAGES += x11/library/libx11
 REQUIRED_PACKAGES += x11/library/libxcomposite
 REQUIRED_PACKAGES += x11/library/libxdamage

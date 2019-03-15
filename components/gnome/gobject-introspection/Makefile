@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2016, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 # gobject-introspection must be built with gcc as gobject-introspection does
@@ -32,20 +32,13 @@ include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		gobject-introspection
 COMPONENT_VERSION=	1.52.0
+COMPONENT_PROJECT_URL=	https://wiki.gnome.org/Projects/GObjectIntrospection
 COMPONENT_ARCHIVE_HASH= \
     sha256:9fc6d1ebce5ad98942cb21e2fe8dd67b722dcc01981840632a1b233f7d0e2c1e
 COMPONENT_BUGDB=        gnome/libraries
 COMPONENT_ANITYA_ID=	1223
 
 TPNO=			34486
-
-# Requires newer version of library/glib2, not buildable on 11.3, so do not
-# publish.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_32_and_64=
-INSTALL_32_and_64=
-PUBLISH_STAMP=
-endif
 
 include $(WS_MAKE_RULES)/gnome-component.mk
 

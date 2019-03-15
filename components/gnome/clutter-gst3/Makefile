@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            32_and_64
@@ -35,15 +35,12 @@ COMPONENT_PROJECT_URL=  http://www.clutter-project.org/
 COMPONENT_ARCHIVE_HASH=	\
 	sha256:f1fc57fb32ea7e3d9234b58db35eb9ef3028cf0b266d85235f959edc0fe3dfd4
 COMPONENT_BUGDB=        library/clutter
-COMPONENT_ANITYA_ID=	302
+COMPONENT_ANITYA_ID=	304
 
 TPNO=			34586
 
 # Requires a display
 TEST_TARGET = $(SKIP_TEST)
-
-# Needs gobject-introspection, not available on S11.
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/gnome-component.mk
 

@@ -20,30 +20,33 @@
 #
 
 #
-# Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2018, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            64
 include ../../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		mkfontscale
-COMPONENT_VERSION=	1.1.2
+COMPONENT_VERSION=	1.1.3
 COMPONENT_ARCHIVE_HASH= \
-	sha256:8c6d5228af885477b9aec60ca6f172578e7d2de42234357af62fb00439453f20
+	sha256:1e98df69ee5f4542d711e140e1d93e2c3f2775407ccbb7849110d52b91782a6a
 COMPONENT_BUGDB=        x11/xclients
 COMPONENT_ANITYA_ID=	15043
+TPNO=			49491
 
 COMPONENT_NAME_1=       mkfontdir
 COMPONENT_VERSION_1=    1.0.7
 COMPONENT_ARCHIVE_HASH_1=       \
     sha256:56d52a482df130484e51fd066d1b6eda7c2c02ddbc91fe6e2be1b9c4e7306530
-COMPONENT_ANITYA_ID=    15044
+COMPONENT_ANITYA_ID_1=	15044
+TPNO_1=			45768
 
 COMPONENT_NAME_2=       bdftopcf
-COMPONENT_VERSION_2=    1.0.5
+COMPONENT_VERSION_2=    1.1
 COMPONENT_ARCHIVE_HASH_2=       \
-    sha256:38f447be0c61f94c473f128cf519dd0cff63b5d7775240a2e895a183a61e2026
-COMPONENT_ANITYA_ID=    15044
+    sha256:4b4df05fc53f1e98993638d6f7e178d95b31745c4568cee407e167491fd311a2
+COMPONENT_ANITYA_ID_2=	15054
+TPNO_2=			49492
 
 COMPONENT_NAME_3=       font-util
 COMPONENT_VERSION_3=    1.3.1
@@ -51,11 +54,13 @@ COMPONENT_ARCHIVE_HASH_3=       \
     sha256:aa7ebdb0715106dd255082f2310dbaa2cd7e225957c2a77d719720c7cc92b921
 COMPONENT_ARCHIVE_URL_3= \
     $(COMPONENT_PROJECT_URL)/releases/individual/font/$(COMPONENT_ARCHIVE_3)
-COMPONENT_ANITYA_ID=    15055
+COMPONENT_ANITYA_ID_3=	15055
+TPNO_3=			45770
 
 # installalias is a Sun-created addition to this toolset
 COMPONENT_NAME_4=	installalias
 COMPONENT_ARCHIVE_SRC_4=none
+COMPONENT_ANITYA_ID_4=	N/A
 
 TEST_TARGET = $(NO_TESTS)
 
@@ -116,5 +121,6 @@ $(BUILD_DIR_4)/.installed: $(BUILD_DIR_4)/.built
 REQUIRED_PACKAGES += compress/bzip2
 REQUIRED_PACKAGES += library/zlib
 REQUIRED_PACKAGES += system/library/freetype-2
+REQUIRED_PACKAGES += x11/header/x11-protocols
 REQUIRED_PACKAGES += x11/library/libfontenc
 REQUIRED_PACKAGES += x11/library/libxfont

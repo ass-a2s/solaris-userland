@@ -32,14 +32,16 @@ COMPONENT_SRC=          sun-src
 COMPONENT_ARCHIVE=	
 COMPONENT_ARCHIVE_SRC=	none
 COMPONENT_BUGDB=	x11/libraries
+COMPONENT_ANITYA_ID=	N/A
 
 # nothing to download ; just build & package
 BUILD_STYLE= justmake
 TEST_TARGET= $(NO_TESTS)
 
-PKG_PROTO_DIRS += $(BUILD_DIR_$(BITS))
-
 include $(WS_MAKE_RULES)/x11-component.mk
+
+COMPONENT_INSTALL_ENV += INSTALL="$(INSTALL)"
+COMPONENT_INSTALL_ENV += libdir="$(USRLIB)"
 
 REQUIRED_PACKAGES += system/library/math
 REQUIRED_PACKAGES += x11/library/libx11

@@ -18,7 +18,9 @@
 #
 # CDDL HEADER END
 #
-# Copyright (c) 2016, 2017, Oracle and/or its affiliates. All rights reserved.
+
+#
+# Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS=		NO_ARCH
@@ -27,16 +29,13 @@ include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		gnome-tweak-tool
 COMPONENT_VERSION=	3.24.0
-COMPONENT_PROJECT_URL=	https://wiki.gnome.org/GnomeTweakTool
+COMPONENT_PROJECT_URL=	https://wiki.gnome.org/Apps/Tweaks
 COMPONENT_ARCHIVE_HASH= \
 	sha256:930b248e40db4c10991978f28b46207d6d11aa938b67b36abc68dbc7d37f1e00
-COMPONENT_BUGDB=	gnome/gnome-shell
+COMPONENT_BUGDB=	gnome/preferences
 COMPONENT_ANITYA_ID=	1198
 
 TPNO=			34578
-
-# No need in S11.3 since its for Gnome 3
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 PYTHON_VERSIONS= 2.7
 

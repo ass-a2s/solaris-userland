@@ -20,11 +20,10 @@
 #
 
 #
-# Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2018, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            64
-COMPILER=		gcc
 include ../../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		xorg-server
@@ -34,16 +33,20 @@ COMPONENT_ARCHIVE_HASH= \
 COMPONENT_BUGDB=        x11/xorg-server
 COMPONENT_ANITYA_ID=	5250
 
+TPNO=			45950
+
 PKG_PROTO_DIRS += $(SOURCE_DIR)/config
-PKG_PROTO_DIRS += $(PWD)/sun-src/os/solaris/mdb/scripts
+PKG_PROTO_DIRS += $(COMPONENT_DIR)/sun-src/os/solaris/mdb/scripts
 PKG_PROTO_DIRS += $(SOURCE_DIR)/hw/xfree86/os-support/bus
 
 # Remove compiler specific visibility flag that breaks builds of drivers
 # with other compilers
 FIX_PC_FILES = xorg-server.pc.in
-FIX_PC_FLAGS += -e 's|\@symbol_visibility\@||'
+COMPONENT_FIX_PC_FLAGS += -e 's|\@symbol_visibility\@||'
 
 include $(WS_MAKE_RULES)/x11-component.mk
+
+CFLAGS.studio += $(studio_FEATURES_EXTENSIONS)
 
 CONFIGURE_OPTIONS += --docdir="$(USRSHAREDOCDIR)"
 CONFIGURE_OPTIONS += --enable-dmx
@@ -72,6 +75,7 @@ CONFIGURE_OPTIONS += --with-builderstring="Solaris ABI: $(BITS)-bit"
 CONFIGURE_OPTIONS += --with-os-name="`uname -srm`"
 CONFIGURE_OPTIONS += --with-log-dir="/var/log"
 CONFIGURE_OPTIONS += --with-xkb-output="/var/run/xkb"
+CONFIGURE_OPTIONS += --with-serverconfig-path="/usr/lib/xorg"
 CONFIGURE_OPTIONS += --with-module-dir="/usr/lib/xorg/modules"
 CONFIGURE_OPTIONS += --with-dri-driver-path="/usr/lib/xorg/modules/dri/$(MACH64)"
 CONFIGURE_OPTIONS += --with-default-font-path="catalogue:/etc/X11/fontpath.d"
@@ -83,9 +87,6 @@ COMPONENT_PREP_ACTION +=(cd $(@D); $(AUTORECONF_ENV) autoreconf -fiv);
 COMPONENT_POST_UNPACK_ACTION = \
         $(CP) -r sun-src/IA $(SOURCE_DIR); \
         $(CP) -r sun-src/os/* $(SOURCE_DIR)/os;
-
-COMPONENT_POST_INSTALL_ACTION += \
-	$(CP) $(PROTO_DIR)/usr/lib/$(MACH64)/xorg/protocol.txt $(PROTO_DIR)/usr/lib/xorg/;
 
 LDFLAGS += -lm
 CFLAGS += -I/usr/include/pixman-1
@@ -188,15 +189,29 @@ COMPONENT_TEST_TRANSFORMS += \
         '-e "/FAIL:/p" ' \
         '-e "/ERROR:/p" '
 
+# Needed for agp headers on x86
+REQUIRED_PACKAGES.i386 += driver/graphics/agpgart
+REQUIRED_PACKAGES += $(REQUIRED_PACKAGES.$(MACH))
+
+REQUIRED_PACKAGES += developer/assembler
+REQUIRED_PACKAGES += developer/debug/mdb
+REQUIRED_PACKAGES += developer/documentation-tool/doxygen
+REQUIRED_PACKAGES += developer/lexer/flex
+REQUIRED_PACKAGES += developer/parser/bison
 REQUIRED_PACKAGES += diagnostic/scanpci
 REQUIRED_PACKAGES += file/gnu-coreutils
+REQUIRED_PACKAGES += image/graphviz
 REQUIRED_PACKAGES += library/graphics/pixman
+REQUIRED_PACKAGES += system/dtrace
 REQUIRED_PACKAGES += system/hal
 REQUIRED_PACKAGES += system/library/libdbus
 REQUIRED_PACKAGES += system/library/math
 REQUIRED_PACKAGES += system/library/security/crypto
+REQUIRED_PACKAGES += x11/header/x11-protocols
+REQUIRED_PACKAGES += x11/font-utilities
 REQUIRED_PACKAGES += x11/library/libdmx
 REQUIRED_PACKAGES += x11/library/libdrm
+REQUIRED_PACKAGES += x11/library/libepoxy
 REQUIRED_PACKAGES += x11/library/libx11
 REQUIRED_PACKAGES += x11/library/libxau
 REQUIRED_PACKAGES += x11/library/libxcb
@@ -207,8 +222,11 @@ REQUIRED_PACKAGES += x11/library/libxfont2
 REQUIRED_PACKAGES += x11/library/libxi
 REQUIRED_PACKAGES += x11/library/libxmuu
 REQUIRED_PACKAGES += x11/library/libxrender
+REQUIRED_PACKAGES += x11/library/libxres
 REQUIRED_PACKAGES += x11/library/libxshmfence
 REQUIRED_PACKAGES += x11/library/mesa
 REQUIRED_PACKAGES += x11/library/toolkit/libxaw7
 REQUIRED_PACKAGES += x11/library/toolkit/libxt
 REQUIRED_PACKAGES += x11/library/xcb-util
+REQUIRED_PACKAGES += x11/library/xtrans
+REQUIRED_PACKAGES += x11/keyboard/xkeyboard-config

@@ -25,22 +25,21 @@
 BUILD_BITS= 64
 # Must use gcc because of 21090206
 COMPILER= gcc
+
 include ../../../make-rules/shared-macros.mk
 
-# with gcc7 on sparc build cores dump
-GCC_ROOT = /usr/gcc/5
-
 COMPONENT_NAME=		php
-COMPONENT_VERSION=	7.1.8
+COMPONENT_VERSION=	7.1.25
 UL_PHP_MINOR_VERSION=	7.1
 COMPONENT_PROJECT_URL=	http://php.net/
 COMPONENT_ARCHIVE=	$(COMPONENT_SRC).tar.xz
 COMPONENT_ARCHIVE_HASH=\
-    sha256:8943858738604acb33ecedb865d6c4051eeffe4e2d06f3a3c8f794daccaa2aab
+    sha256:0fd8dad1903cd0b2d615a1fe4209f99e53b7292403c8ffa1919c0f4dd1eada88
 COMPONENT_ARCHIVE_URL=	http://php.net/get/$(COMPONENT_ARCHIVE)/from/this/mirror
 COMPONENT_ANITYA_ID=	3627
 
-TPNO=			37404
+TPNO=			47859
+TPNO_IMAP=		32942
 
 include $(WS_MAKE_RULES)/common.mk
 include $(PHP_TOP_DIR)/php.mk
@@ -135,22 +134,30 @@ COMPONENT_POST_INSTALL_ACTION += \
 	 > proto-scripts/php-config-proto ; \
 	chmod 755 proto-scripts/php-config-proto ) ;
 
+# sapi/fpm/tests/002.phpt leaves php-fpm running
+COMPONENT_PRE_TEST_ACTION += (pkill -u `id -u` php-fpm; exit 0);
 # test failures; keep going
 COMPONENT_TEST_ARGS += -k -i
 # different results for different architectures
 COMPONENT_TEST_MASTER = $(COMPONENT_TEST_RESULTS_DIR)/results-$(MACH)-$(BITS).master
 COMPONENT_TEST_TRANSFORMS += \
-    '-e "/^make/d" '
+    '-e "/^make/d" ' \
+    '-e "/^TEST RESULT SUMMARY$$/,\$$p" ' \
+    '-e "/.*/d" '
 
 CLEAN_PATHS += proto-scripts
 
 # test results are unstable between runs but still useful for humans.
 $(SKIP_TEST_AT_TOP_LEVEL)
 
+clobber::
+	cd ../uw-imap; gmake clobber
+
+# Add directory for generate check
+GENERATE_PROTO_DIRS += files^files
+
 REQUIRED_PACKAGES += developer/icu
-REQUIRED_PACKAGES += developer/gcc-5
 REQUIRED_PACKAGES += library/libxml2
-$(SOLARIS_11_3_ONLY)REQUIRED_PACKAGES += library/openldap
 REQUIRED_PACKAGES += library/security/openssl
 REQUIRED_PACKAGES += system/dtrace
 REQUIRED_PACKAGES += system/library/gcc/gcc-c-runtime

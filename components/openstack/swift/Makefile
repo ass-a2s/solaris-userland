@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 include ../../../make-rules/shared-macros.mk
@@ -37,6 +37,7 @@ COMPONENT_ARCHIVE_URL=  https://tarballs.openstack.org/$(COMPONENT_NAME)/$(COMPO
 COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_PROJECT_URL=	http://www.openstack.org/
 COMPONENT_BUGDB=	service/swift
+COMPONENT_ANITYA_ID=	17227
 
 TPNO=			30364
 
@@ -46,7 +47,6 @@ include $(WS_MAKE_RULES)/prep.mk
 include $(WS_MAKE_RULES)/setup.py.mk
 # OpenStack Mitaka requires OVS and RAD changes not present in 11.3
 BUILD_BITS=NO_ARCH
-include $(WS_MAKE_RULES)/no-evaluation.mk
 include $(WS_MAKE_RULES)/ips.mk
 
 ASLR_MODE = $(ASLR_NOT_APPLICABLE)

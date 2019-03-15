@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2016, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS= NO_ARCH
@@ -31,13 +31,11 @@ COMPONENT_VERSION=      1.2.0
 COMPONENT_SRC=          files
 COMPONENT_ARCHIVE_SRC=	none
 COMPONENT_BUGDB=	gnome/applications
+COMPONENT_ANITYA_ID=	N/A
 
 # nothing to download ; just build & package
 BUILD_STYLE= justmake
 TEST_TARGET= $(NO_TESTS)
-
-# Depends on pygobject3, not available on S11.
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/common.mk
 

@@ -20,8 +20,9 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
+
 BUILD_BITS= 64_and_32
 # All components using gobject-introspection must be built with gcc as
 # gobject-introspection does not produce correct results when using Studio.
@@ -30,19 +31,13 @@ include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		libmediaart
 COMPONENT_VERSION=	1.9.1
+COMPONENT_PROJECT_URL=	https://developer.gnome.org/libmediaart/
 COMPONENT_ARCHIVE_HASH= \
 	sha256:5b14aa4e0cc84eaec57b6cb28f39092d503fdaecf36d5d165fac37583b7fe949
 COMPONENT_BUGDB=	gnome/multimedia
 COMPONENT_ANITYA_ID=	13148
 
 TPNO=			34502
-
-# Needs updated glib2, not available on S11.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_32_and_64=
-INSTALL_32_and_64=
-PUBLISH_STAMP=
-endif
 
 include $(WS_MAKE_RULES)/gnome-component.mk
 

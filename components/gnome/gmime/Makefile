@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            32_and_64
@@ -34,15 +34,13 @@ include ../../../make-rules/shared-macros.mk
 # depends on it.
 COMPONENT_NAME=		gmime
 COMPONENT_VERSION=	2.6.23
+COMPONENT_PROJECT_URL=	https://developer.gnome.org/gmime/
 COMPONENT_ARCHIVE_HASH= \
 	sha256:7149686a71ca42a1390869b6074815106b061aaeaaa8f2ef8c12c191d9a79f6a
 COMPONENT_BUGDB=        gnome/libraries
 COMPONENT_ANITYA_ID=	13124
 
 TPNO=			34659
-
-# Needs gobject-introspection, not available on S11.
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/gnome-component.mk
 

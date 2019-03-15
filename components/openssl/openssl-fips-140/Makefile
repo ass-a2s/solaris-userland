@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2011, 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 include ../../../make-rules/shared-macros.mk
@@ -35,18 +35,20 @@ COMPONENT_NAME =	openssl-fips-140
 # is the FIPS module version. The COMPONENT_VERSION changes with the core
 # OpenSSL version, but the IPS_COMPONENT_VERSION is purposely only to change if
 # the FIPS module version changes.
-COMPONENT_VERSION =	1.0.2n
+COMPONENT_VERSION =	1.0.2r
 IPS_COMPONENT_VERSION = 2.0.13
-COMPONENT_PROJECT_URL=	http://www.openssl.org/
+COMPONENT_PROJECT_URL=	https://www.openssl.org/
 COMPONENT_SRC_NAME =	openssl
 COMPONENT_SRC =		$(COMPONENT_SRC_NAME)-$(COMPONENT_VERSION)
 COMPONENT_ARCHIVE =	$(COMPONENT_SRC).tar.gz
 COMPONENT_ARCHIVE_HASH=	\
-    sha256:370babb75f278c39e0c50e8c4e7493bc0f18db6867478341a832a982fd15a8fe
+    sha256:ae51d08bba8a83958e894946f15303ff894d75c2b8bbd44a852b64e3fe11d0d6
 COMPONENT_ARCHIVE_URL =	$(COMPONENT_PROJECT_URL)source/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_BUGDB=	library/openssl
+COMPONENT_ANITYA_ID=    2566
 
-TPNO=			39672
+TPNO=			49718
 
 # Clone the patch files to the patches-all dir.
 # COPY_COMMON_FILES is there so that rsync is called as soon as
@@ -56,7 +58,7 @@ CLEAN_PATHS += $(PATCH_DIR)
 COPY_COMMON_FILES:= $(shell rsync -ac ../common/patches/ patches/ $(PATCH_DIR))
 
 # OpenSSL FIPS directory
-OPENSSL_FIPS_DIR = $(COMPONENT_DIR)/fipscanister
+OPENSSL_FIPS_DIR = $(COMPONENT_DIR)/$(FIPSCANISTER_DIR)
 
 include $(WS_MAKE_RULES)/prep.mk
 include $(WS_MAKE_RULES)/configure.mk
@@ -76,9 +78,9 @@ ENGINESDIR_64 = /lib/openssl/engines/64
 # building FIPS-140 libraries.
 # What we do here follows the OpenSSL FIPS-140 User Guide instructions.
 FIPS_BUILD_DIR_32 = $(shell echo $(BUILD_DIR_32) | \
-    sed -e 's/openssl-fips-140/openssl-fips-140\/fipscanister/g' )
+    sed -e 's/openssl-fips-140/openssl-fips-140\/$(FIPSCANISTER_DIR)/g' )
 FIPS_BUILD_DIR_64 = $(shell echo $(BUILD_DIR_64) | \
-    sed -e 's/openssl-fips-140/openssl-fips-140\/fipscanister/g' )
+    sed -e 's/openssl-fips-140/openssl-fips-140\/$(FIPSCANISTER_DIR)/g' )
 
 # Ignore default CC_FOR_BUILD, CC, and CXX in CONFIGURE_ENV.
 CONFIGURE_ENV += CC_FOR_BUILD=
@@ -150,14 +152,14 @@ COMPONENT_POST_CONFIGURE_ACTION = \
 # libraries, the canister is needed. Note that we must unset BITS that would
 # override the same variable used in openssl-fips' Makefile, and we would
 # end up up with both canisters built in 64 (or 32) bits.
-fipscanister/build/$(MACH32)/.installed \
-fipscanister/build/$(MACH64)/.installed:
+$(FIPSCANISTER_DIR)/build/$(MACH32)/.installed \
+$(FIPSCANISTER_DIR)/build/$(MACH64)/.installed:
 	( unset BITS; \
-	$(MAKE) -C fipscanister install; )
+	$(MAKE) -C $(FIPSCANISTER_DIR) install; )
 
 # download, clean, and clobber should all propogate to the fips bits
 download clobber clean::
-	(cd fipscanister ; $(GMAKE) $@)
+	(cd fipscanister; $(GMAKE) $@; cd ../fipscanister-dev; $(GMAKE) $@;)
 
 # We do not ship our engines as patches since it would be more difficult to
 # update the files which have been under continuous development. We rather copy
@@ -167,10 +169,10 @@ download clobber clean::
 COMPONENT_PRE_BUILD_ACTION = \
     ( $(LN) -fs $(COMPONENT_DIR)/../common/engines/pkcs11/*     $(@D)/engines; \
       $(MKDIR) $(@D)/bin; \
-      $(LN) -fs $(OPENSSL_FIPS_DIR)/openssl-fips-$(IPS_COMPONENT_VERSION)/fips/fips.h $(@D)/include/openssl; \
-      $(LN) -fs $(OPENSSL_FIPS_DIR)/openssl-fips-$(IPS_COMPONENT_VERSION)/fips/fipssyms.h $(@D)/include/openssl; \
-      $(LN) -fs $(OPENSSL_FIPS_DIR)/openssl-fips-$(IPS_COMPONENT_VERSION)/fips/rand/fips_rand.h $(@D)/include/openssl; \
-      $(LN) -fs $(OPENSSL_FIPS_DIR)/openssl-fips-$(IPS_COMPONENT_VERSION)/fips/fipsld $(@D)/bin/; \
+      $(LN) -fs $(OPENSSL_FIPS_DIR)/build/$(MACH$(BITS))/include/openssl/fips.h $(@D)/include/openssl; \
+      $(LN) -fs $(OPENSSL_FIPS_DIR)/build/$(MACH$(BITS))/include/openssl/fipssyms.h $(@D)/include/openssl; \
+      $(LN) -fs $(OPENSSL_FIPS_DIR)/build/$(MACH$(BITS))/include/openssl/fips_rand.h $(@D)/include/openssl; \
+      $(LN) -fs $(OPENSSL_FIPS_DIR)/build/$(MACH$(BITS))/fips/fipsld $(@D)/bin/; \
       $(LN) -fs $(OPENSSL_FIPS_DIR)/build/$(MACH$(BITS))/fips/fips_standalone_sha1 $(@D)/bin/; \
       $(LN) -fs $(COMPONENT_DIR)/build/$(MACH$(BITS))/fips_premain_dso $(@D)/bin/;)
 
@@ -188,12 +190,15 @@ COMPONENT_POST_INSTALL_ACTION.64 = \
         $(BUILD_DIR_64)/libcrypto.so.1.0.0;
 COMPONENT_POST_INSTALL_ACTION += $(COMPONENT_POST_INSTALL_ACTION.$(BITS))
 
-$(SOURCE_DIR)/.prep: fipscanister/build/$(MACH32)/.installed \
-		     fipscanister/build/$(MACH64)/.installed
+$(SOURCE_DIR)/.prep: $(FIPSCANISTER_DIR)/build/$(MACH32)/.installed \
+		     $(FIPSCANISTER_DIR)/build/$(MACH64)/.installed
 
 configure:	$(CONFIGURE_32_and_64)
 
-build:			$(BUILD_32_and_64)
+build:		FIPSCANISTER_DIR = fipscanister
+build:		$(BUILD_32_and_64)
+build-dev:	FIPSCANISTER_DIR = fipscanister-dev
+build-dev:	$(BUILD_32_and_64)
 
 # We follow what we do for install in openssl/openssl-1.0.0 component. Please
 # see the comment in Makefile in there for more information.

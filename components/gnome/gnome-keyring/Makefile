@@ -18,7 +18,9 @@
 #
 # CDDL HEADER END
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+
+#
+# Copyright (c) 2015, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS=             64_and_32
@@ -36,9 +38,6 @@ COMPONENT_ANITYA_ID=	13133
 TPNO=			35133
 
 TEST_TARGET = $(NO_TESTS)
-
-# Needs updated glib2, not available on S11.
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/gnome-component.mk
 
@@ -66,6 +65,7 @@ REQUIRED_PACKAGES += crypto/gnupg
 REQUIRED_PACKAGES += library/glib2
 REQUIRED_PACKAGES += library/gnome/gcr
 REQUIRED_PACKAGES += network/ssh
+REQUIRED_PACKAGES += system/library/pam-core
 REQUIRED_PACKAGES += system/library/libdbus
 REQUIRED_PACKAGES += system/library/security/libgcrypt
 

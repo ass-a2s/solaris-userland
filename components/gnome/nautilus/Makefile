@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            64_and_32
@@ -31,16 +31,13 @@ include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		nautilus
 COMPONENT_VERSION=	3.24.0
-COMPONENT_PROJECT_URL=  https://wiki.gnome.org/Projects/Nautilus
+COMPONENT_PROJECT_URL=  https://wiki.gnome.org/Apps/Files
 COMPONENT_ARCHIVE_HASH= \
 	sha256:8a499247caff3c02437c0ad955f043e675a056912d8553d9c9783c762f5dbbbd
 COMPONENT_BUGDB=        gnome/nautilus
 COMPONENT_ANITYA_ID=	2050
 
 TPNO=			35134
-
-# Needs gobject-introspection, not available on S11.3
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/gnome-component.mk
 

@@ -20,24 +20,20 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 BUILD_BITS= 64_and_32
 include ../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		liblogging
-COMPONENT_VERSION=	1.0.5
+COMPONENT_VERSION=	1.0.6
 COMPONENT_PROJECT_URL=	http://www.liblogging.org/
 COMPONENT_ARCHIVE_HASH=	\
-    sha256:310dc1691279b7a669d383581fe4b0babdc7bf75c9b54a24e51e60428624890b
+    sha256:338c6174e5c8652eaa34f956be3451f7491a4416ab489aef63151f802b00bf93
 COMPONENT_ARCHIVE_URL=	\
-    http://download.openpkg.org/components/cache/$(COMPONENT_NAME)/$(COMPONENT_ARCHIVE)
-# The original download site seems to be broken, it is not possible to
-# download the archive from there
-#    http://download.rsyslog.com/$(COMPONENT_NAME)/$(COMPONENT_ARCHIVE)
-# The checksum of the archive corresponds to what is written on liblogging.org
+    http://download.rsyslog.com/$(COMPONENT_NAME)/$(COMPONENT_ARCHIVE)
 COMPONENT_BUGDB=	service/rsyslog
-TPNO=			27183
+TPNO=			46848
 COMPONENT_ANITYA_ID=	1654
 
 TEST_TARGET= $(NO_TESTS)

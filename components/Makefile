@@ -18,7 +18,7 @@
 #
 # CDDL HEADER END
 #
-# Copyright (c) 2010, 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 include ../make-rules/shared-macros.mk
@@ -64,12 +64,24 @@ $(WS_MACH)/depends.mk:     $(WS_MACH)/components.mk
 # remove whitespace from lines, drop empty lines, and REQUIRED_PACKAGES +=
 # to the lines.  Pass that through sort -u
 #
+# NOTE: the grep -v is due to package reorganisation within ON and is
+# needed until the Userland build starts to use the Solaris build with
+# the ON changes. Once that is done this comment and the grep -v lines
+# can be removed.
+#
 $(WS_MACH)/requires.mk:	$(WS_MACH)
 	@echo "Generating list of required packages to build consolidation..."
 	@$(GMAKE) component-hook \
 		COMPONENT_HOOK='@echo $$(REQUIRED_PACKAGES:%="%\\n")' | \
 		$(GSED) -e '/\S\s\S/d' -e 's/^ //g' -e '/^\s*$$/d' \
 		    -e 's/^/REQUIRED_PACKAGES += /' | \
+		grep -v ' system/device-allocation$$' | \
+		grep -v ' system/library/datalink$$' | \
+		grep -v ' system/library/devinfo$$' | \
+		grep -v ' system/library/ldap$$' | \
+		grep -v ' system/library/libc$$' | \
+		grep -v ' system/library/pam-core$$' | \
+		grep -v ' system/library/smf$$' | \
 		sort -u >$(@)
 
 system-check::	$(WS_MACH)/requires.mk
@@ -90,10 +102,12 @@ clean:			TARGET = clean
 clobber:		TARGET = clobber
 test:			TARGET = test
 system-test:		TARGET = system-test
+check_anitya:		TARGET = check_anitya
 check_rtime:		TARGET = check_rtime
 zone-build:		TARGET = component-zone-build
 component-hook:		TARGET = component-hook
-zone-build prep build install publish test system-test check_rtime:	LOG = >$(WS_LOGS)/$(subst /,.,$@).$(TARGET).log 2>&1
+regen-patches:		TARGET = regen-patches
+zone-build prep build install publish test system-test check_rtime regen-patches:	LOG = >$(WS_LOGS)/$(subst /,.,$@).$(TARGET).log 2>&1
 
 # turn off pkglint for the individual component builds.
 ifeq   ($(strip $(PKGLINT_COMPONENT)),)
@@ -117,7 +131,7 @@ zone-build build install publish test system-test: $(COMPONENT_DIRS)
 COMPONENT_DIRS.nosetup =	$(COMPONENT_DIRS:%=%.nosetup)
 
 download unpack patch::	$(COMPONENT_DIRS.nosetup)
-prep check_rtime:		$(COMPONENT_DIRS.nosetup)
+prep check_anitya check_rtime regen-patches:	$(COMPONENT_DIRS.nosetup)
 component-environment-check::	$(COMPONENT_DIRS.nosetup)
 component-hook:	$(COMPONENT_DIRS.nosetup)
 
@@ -194,7 +208,7 @@ incorporation:
 
 # Use PKGLINT below instead of PKGLINTVAR because we know we always want the
 # real one for this set of rules.  We use $(wildcard ...) because not all
-# component directories get published (evaluation builds complicate things).
+# component directories might get published
 pkglint:
 	@echo 'pkglinting all package manifests...'
 	@$(ENV) PYTHONPATH=$(WS_TOOLS)/python \
@@ -206,19 +220,7 @@ pkglint:
 publish:
 	$(PKGREPO) refresh -s $(PKG_REPO)
 	$(PKGREPO) refresh -s $(PKG_EXPERIMENTAL_REPO)
-# The package below is obsolete in S12/11.4, but cannot yet be removed from
-# S11.3 because runtime/python-26 has an optional dependency on it.
-ifeq ($(BUILD_TYPE),evaluation)
-ifeq ($(OS_VERSION),11.3)
-	-$(PKGREPO) remove -s $(PKG_REPO) \
-	    library/python/tkinter-26
-	$(PKGREPO) refresh -s $(PKG_REPO)
-endif
-endif
-# evaluation packages don't need to be incorporated
-ifneq ($(BUILD_TYPE), evaluation)
 	$(MAKE) incorporation
-endif
 # pkglint all of the published manifests in one batch.
 ifdef CANONICAL_REPO
 	$(MAKE) pkglint
@@ -227,5 +229,11 @@ endif
 $(COMPONENT_DIRS.nosetup):	$(WS_LOGS) FORCE
 	@cd $(@:%.nosetup=%) && echo "$(TARGET) $(@:%.nosetup=%)" && \
 	 $(BASS_O_MATIC) $(@:%.nosetup=--component %) --make $(TARGET) $(LOG)
+
+# component report uses component-hook to process every component.
+# component-hook however executes on the 'components' directory itself (it's
+# defined in shared-macros.mk). We don't want to run component report in this
+# directory, thus we need to disable it
+NO_PKG_REPORT = 1
 
 FORCE:

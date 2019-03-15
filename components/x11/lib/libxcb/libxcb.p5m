@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2018, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 <transform file path=usr/share/xcb/.*\.xml$ -> default facet.devel true>
@@ -35,7 +35,6 @@ set name=pkg.summary value="libxcb - The X11 protocol C Binding"
 set name=pkg.description \
     value="The X protocol C-language Binding (XCB) is a replacement for Xlib featuring a small footprint, latency hiding, direct access to the protocol, improved threading support, and extensibility."
 set name=com.oracle.info.description value=libxcb
-set name=com.oracle.info.tpno value=$(TPNO)
 set name=info.classification value=org.opensolaris.category.2008:System/X11
 set name=info.source-url value=$(COMPONENT_ARCHIVE_URL) \
     value=$(COMPONENT_ARCHIVE_URL_1)
@@ -48,6 +47,7 @@ file path=usr/include/xcb/damage.h
 file path=usr/include/xcb/dpms.h
 file path=usr/include/xcb/dri2.h
 file path=usr/include/xcb/dri3.h
+file path=usr/include/xcb/ge.h
 file path=usr/include/xcb/glx.h
 file path=usr/include/xcb/present.h
 file path=usr/include/xcb/randr.h
@@ -505,16 +505,39 @@ file path=usr/share/man/man3xcb/xcb_dri2_wait_sbc_unchecked.3xcb
 file path=usr/share/man/man3xcb/xcb_dri3_buffer_from_pixmap.3xcb
 file path=usr/share/man/man3xcb/xcb_dri3_buffer_from_pixmap_reply.3xcb
 file path=usr/share/man/man3xcb/xcb_dri3_buffer_from_pixmap_unchecked.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_buffers_from_pixmap.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_buffers_from_pixmap_buffers.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_buffers_from_pixmap_buffers_end.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_buffers_from_pixmap_buffers_length.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_buffers_from_pixmap_offsets.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_buffers_from_pixmap_offsets_end.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_buffers_from_pixmap_offsets_length.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_buffers_from_pixmap_reply.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_buffers_from_pixmap_strides.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_buffers_from_pixmap_strides_end.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_buffers_from_pixmap_strides_length.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_buffers_from_pixmap_unchecked.3xcb
 file path=usr/share/man/man3xcb/xcb_dri3_fd_from_fence.3xcb
 file path=usr/share/man/man3xcb/xcb_dri3_fd_from_fence_reply.3xcb
 file path=usr/share/man/man3xcb/xcb_dri3_fd_from_fence_unchecked.3xcb
 file path=usr/share/man/man3xcb/xcb_dri3_fence_from_fd.3xcb
 file path=usr/share/man/man3xcb/xcb_dri3_fence_from_fd_checked.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_get_supported_modifiers.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_get_supported_modifiers_reply.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_get_supported_modifiers_screen_modifiers.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_get_supported_modifiers_screen_modifiers_end.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_get_supported_modifiers_screen_modifiers_length.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_get_supported_modifiers_unchecked.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_get_supported_modifiers_window_modifiers.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_get_supported_modifiers_window_modifiers_end.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_get_supported_modifiers_window_modifiers_length.3xcb
 file path=usr/share/man/man3xcb/xcb_dri3_open.3xcb
 file path=usr/share/man/man3xcb/xcb_dri3_open_reply.3xcb
 file path=usr/share/man/man3xcb/xcb_dri3_open_unchecked.3xcb
 file path=usr/share/man/man3xcb/xcb_dri3_pixmap_from_buffer.3xcb
 file path=usr/share/man/man3xcb/xcb_dri3_pixmap_from_buffer_checked.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_pixmap_from_buffers.3xcb
+file path=usr/share/man/man3xcb/xcb_dri3_pixmap_from_buffers_checked.3xcb
 file path=usr/share/man/man3xcb/xcb_dri3_query_version.3xcb
 file path=usr/share/man/man3xcb/xcb_dri3_query_version_reply.3xcb
 file path=usr/share/man/man3xcb/xcb_dri3_query_version_unchecked.3xcb
@@ -536,6 +559,9 @@ file path=usr/share/man/man3xcb/xcb_free_gc_checked.3xcb
 file path=usr/share/man/man3xcb/xcb_free_pixmap.3xcb
 file path=usr/share/man/man3xcb/xcb_free_pixmap_checked.3xcb
 file path=usr/share/man/man3xcb/xcb_ge_generic_event_t.3xcb
+file path=usr/share/man/man3xcb/xcb_genericevent_query_version.3xcb
+file path=usr/share/man/man3xcb/xcb_genericevent_query_version_reply.3xcb
+file path=usr/share/man/man3xcb/xcb_genericevent_query_version_unchecked.3xcb
 file path=usr/share/man/man3xcb/xcb_get_atom_name.3xcb
 file path=usr/share/man/man3xcb/xcb_get_atom_name_name.3xcb
 file path=usr/share/man/man3xcb/xcb_get_atom_name_name_end.3xcb
@@ -1436,6 +1462,9 @@ file path=usr/share/man/man3xcb/xcb_randr_configure_output_property.3xcb
 file path=usr/share/man/man3xcb/xcb_randr_configure_output_property_checked.3xcb
 file path=usr/share/man/man3xcb/xcb_randr_configure_provider_property.3xcb
 file path=usr/share/man/man3xcb/xcb_randr_configure_provider_property_checked.3xcb
+file path=usr/share/man/man3xcb/xcb_randr_create_lease.3xcb
+file path=usr/share/man/man3xcb/xcb_randr_create_lease_reply.3xcb
+file path=usr/share/man/man3xcb/xcb_randr_create_lease_unchecked.3xcb
 file path=usr/share/man/man3xcb/xcb_randr_create_mode.3xcb
 file path=usr/share/man/man3xcb/xcb_randr_create_mode_reply.3xcb
 file path=usr/share/man/man3xcb/xcb_randr_create_mode_unchecked.3xcb
@@ -1449,6 +1478,8 @@ file path=usr/share/man/man3xcb/xcb_randr_delete_provider_property.3xcb
 file path=usr/share/man/man3xcb/xcb_randr_delete_provider_property_checked.3xcb
 file path=usr/share/man/man3xcb/xcb_randr_destroy_mode.3xcb
 file path=usr/share/man/man3xcb/xcb_randr_destroy_mode_checked.3xcb
+file path=usr/share/man/man3xcb/xcb_randr_free_lease.3xcb
+file path=usr/share/man/man3xcb/xcb_randr_free_lease_checked.3xcb
 file path=usr/share/man/man3xcb/xcb_randr_get_crtc_gamma.3xcb
 file path=usr/share/man/man3xcb/xcb_randr_get_crtc_gamma_blue.3xcb
 file path=usr/share/man/man3xcb/xcb_randr_get_crtc_gamma_blue_end.3xcb
@@ -2485,7 +2516,14 @@ file path=usr/share/xcb/xproto.xml
 file path=usr/share/xcb/xtest.xml
 file path=usr/share/xcb/xv.xml
 file path=usr/share/xcb/xvmc.xml
-license COPYING license=MIT
+license COPYING license="MIT (libxcb)" \
+    com.oracle.info.description="libxcb - X protocol C-language binding library" \
+    com.oracle.info.name=libxcb com.oracle.info.tpno=$(TPNO) \
+    com.oracle.info.version=$(COMPONENT_VERSION)
+license $(COMPONENT_SRC_1)/COPYING license="MIT (xcb-proto)" \
+    com.oracle.info.description="xcb-proto - XML/XCB protocol descriptions for libxcb" \
+    com.oracle.info.name=xcb-proto com.oracle.info.tpno=$(TPNO_1) \
+    com.oracle.info.version=$(COMPONENT_VERSION_1)
 depend type=require fmri=pkg:/x11/header/x11-protocols facet.devel=true
 # pkg-config dependency from xcb.pc
 depend type=require fmri=pkg:/x11/library/libpthread-stubs facet.devel=true

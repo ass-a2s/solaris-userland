@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2011, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 BUILD_BITS= 64
 include ../../make-rules/shared-macros.mk
@@ -31,6 +31,7 @@ COMPONENT_PROJECT_URL=	http://www.lighttpd.net/
 COMPONENT_ARCHIVE_HASH=	\
     sha256:8a5749e218237fafc3119dd8a4fcf510ea728728b3fcf1193fcad7209be4b6d7
 COMPONENT_ARCHIVE_URL=	$(COMPONENT_PROJECT_URL)download/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_ANITYA_ID=	1817
 
 TPNO=			31753
@@ -59,11 +60,7 @@ CONFIGURE_OPTIONS +=	--with-lua
 CONFIGURE_OPTIONS +=	--with-openssl
 CONFIGURE_OPTIONS +=	--with-pcre
 CONFIGURE_OPTIONS +=	--with-ldap
-ifeq ($(OS_VERSION), 11.3)
-CONFIGURE_OPTIONS +=	--with-mysql=$(USRDIR)/mysql/5.5/bin/mysql_config
-else
 CONFIGURE_OPTIONS +=	--with-mysql=$(USRDIR)/mysql/5.7/bin/mysql_config
-endif
 CONFIGURE_OPTIONS +=    PCRECONFIG="$(USRBINDIR64)/pcre-config"
 
 COMPONENT_TEST_TRANSFORMS += \
@@ -72,10 +69,8 @@ COMPONENT_TEST_TRANSFORMS += \
 	'-e "/.*/d" '
 
 REQUIRED_PACKAGES += compress/bzip2
-$(SOLARIS_11_3_ONLY)REQUIRED_PACKAGES += database/mysql-55
-$(SOLARIS_11_3_ONLY)REQUIRED_PACKAGES += database/mysql-55/library
-$(SOLARIS_11_4_ONLY)REQUIRED_PACKAGES += database/mysql-57
-$(SOLARIS_11_4_ONLY)REQUIRED_PACKAGES += database/mysql-57/library
+$(SOLARIS_11_4_5_ONLY)REQUIRED_PACKAGES += database/mysql-57
+$(SOLARIS_11_4_5_ONLY)REQUIRED_PACKAGES += database/mysql-57/library
 $(SOLARIS_11_3_ONLY)REQUIRED_PACKAGES += library/openldap
 REQUIRED_PACKAGES += library/pcre
 REQUIRED_PACKAGES += library/security/openssl

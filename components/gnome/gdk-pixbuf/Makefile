@@ -30,18 +30,14 @@ BUILD_BITS =		32_and_64
 include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		gdk-pixbuf
-COMPONENT_VERSION=	2.36.5
+COMPONENT_VERSION=	2.36.11
 COMPONENT_PROJECT_URL=	https://wiki.gnome.org/Projects/GdkPixbuf
 COMPONENT_ARCHIVE_HASH= \
-    sha256:7ace06170291a1f21771552768bace072ecdea9bd4a02f7658939b9a314c40fc
+    sha256:ae62ab87250413156ed72ef756347b10208c00e76b222d82d9ed361ed9dde2f3
 COMPONENT_BUGDB=	gnome/libraries
 COMPONENT_ANITYA_ID=	9533
 
-TPNO=			34492
-
-# Requires newer version of library/glib2 which we cannot build on 11.3, so
-# do not publish.
-include $(WS_MAKE_RULES)/no-evaluation.mk
+TPNO=			41638
 
 SYSTEM_TEST_TARGET= $(SYSTEM_TESTS_NOT_IMPLEMENTED)
 include $(WS_MAKE_RULES)/gnome-component.mk
@@ -62,7 +58,6 @@ CONFIGURE_OPTIONS += --with-x11
 COMPONENT_BUILD_ENV += CFLAGS="$(strip $(CFLAGS))"
 COMPONENT_BUILD_ENV += LDFLAGS="$(strip $(LDFLAGS))"
 
-ifneq ($(BUILD_TYPE), evaluation)
 # Generate and install architecture-specific configuration files that define
 # the set of plugins available.
 PROTOLCACHEDIR.32=	$(PROTO_DIR)/$(USRLIB.32)/gdk-pixbuf-2.0/2.10.0
@@ -85,7 +80,6 @@ $(PROTOLCACHECONF.64):
 	  $(GSED) -e "s#$(PROTO_DIR)/##" > $(PROTOLCACHECONF.64)
 
 install: $(PROTOLCACHECONF.32) $(PROTOLCACHECONF.64)
-endif
 
 # Needed for "gmake test" to work successfully.
 unexport SHELLOPTS
@@ -96,6 +90,7 @@ COMPONENT_TEST_TRANSFORMS += \
 	'-e "s%/pixbuf/randomly-modified/.*%/pixbuf/randomly-modified/...%"'
 
 # Standard automake test framework results transform
+COMPONENT_TEST_MASTER = $(COMPONENT_TEST_RESULTS_DIR)/results-all.master
 COMPONENT_TEST_TRANSFORMS += \
         '-n ' \
         '-e "/TOTAL/p" ' \

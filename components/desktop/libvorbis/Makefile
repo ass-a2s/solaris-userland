@@ -18,7 +18,9 @@
 #
 # CDDL HEADER END
 #
-# Copyright (c) 2016, 2017, Oracle and/or its affiliates. All rights reserved.
+
+#
+# Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS= 		32_and_64
@@ -26,26 +28,27 @@ COMPILER=		gcc
 include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		libvorbis
-COMPONENT_VERSION=	1.3.5
+COMPONENT_VERSION=	1.3.6
 COMPONENT_PROJECT_URL=	https://xiph.org/vorbis/
 COMPONENT_ARCHIVE_HASH= \
-	sha256:6efbcecdd3e5dfbf090341b485da9d176eb250d893e3eb378c428a2db38301ce
+	sha256:6ed40e0241089a42c48604dc00e362beee00036af2d8b3f46338031c9e0351cb
 COMPONENT_ARCHIVE_URL=	http://downloads.xiph.org/releases/vorbis/$(COMPONENT_ARCHIVE)
 COMPONENT_BUGDB=	gnome/multimedia
 COMPONENT_ANITYA_ID=	1758
 
-TPNO=			39044
-
-# gmake check works and all test pass but because of hard-coded paths
-# check with results-all.master fails
-TEST_TARGET = $(SKIP_TEST)
-
-# ogg-vorbis is not unlockable in S11 gnome-incorporation
-include $(WS_MAKE_RULES)/no-evaluation.mk
+TPNO=			42388
 
 include $(WS_MAKE_RULES)/common.mk
 
 CONFIGURE_ENV += PATH="$(GNUBIN):$(PATH)"
+
+unexport SHELLOPTS
+COMPONENT_TEST_MASTER = $(COMPONENT_TEST_RESULTS_DIR)/results-all.master
+COMPONENT_TEST_ARGS = -k -i
+COMPONENT_TEST_TRANSFORMS += \
+        '-n ' \
+        '-e "/Testing/p" ' \
+        '-e "/ok/p" '
 
 REQUIRED_PACKAGES += codec/libogg
 REQUIRED_PACKAGES += developer/documentation-tool/doxygen

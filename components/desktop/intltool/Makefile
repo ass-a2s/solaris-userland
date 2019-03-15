@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2016, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS= 		NO_ARCH
@@ -32,16 +32,10 @@ COMPONENT_PROJECT_URL=	http://freedesktop.org/wiki/Software/intltool/
 COMPONENT_ARCHIVE_HASH= \
     sha256:67c74d94196b153b774ab9f89b2fa6c6ba79352407037c8c14d5aeb334e959cd
 COMPONENT_ARCHIVE_URL=	https://launchpad.net/$(COMPONENT_NAME)/trunk/$(COMPONENT_VERSION)/+download/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_ANITYA_ID=	1385
 
 TPNO=			25211
-
-# Forked from gnome/gettext, which was in Gnome in 11.3 => do-not-publish.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_NO_ARCH=
-INSTALL_NO_ARCH=
-PUBLISH_STAMP=
-endif
 
 include $(WS_MAKE_RULES)/common.mk
 

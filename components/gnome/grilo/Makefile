@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            64_and_32
@@ -31,6 +31,7 @@ include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		grilo
 COMPONENT_VERSION=	0.3.3
+COMPONENT_PROJECT_URL=	https://wiki.gnome.org/Projects/Grilo
 COMPONENT_ARCHIVE_HASH= \
 	sha256:5c874222c7bdf42490cd56765a593c41407247706bb1f24a1bd5d007aa38a0e3
 COMPONENT_BUGDB=        gnome/multimedia
@@ -40,9 +41,6 @@ TPNO=			34587
 
 # Tests don't seem to do anything - 23712784
 TEST_TARGET = $(SKIP_TEST)
-
-# Needs gobject-introspection, not available on S11.3
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/gnome-component.mk
 

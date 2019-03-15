@@ -20,18 +20,19 @@
 #
 
 #
-# Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2018, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            64_and_32
 include ../../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		libxshmfence
-COMPONENT_VERSION=	1.2
+COMPONENT_VERSION=	1.3
 COMPONENT_ARCHIVE_HASH= \
-	sha256:d21b2d1fd78c1efbe1f2c16dae1cb23f8fd231dcf891465b8debe636a9054b0c
+	sha256:b884300d26a14961a076fbebc762a39831cb75f92bed5ccf9836345b459220c7
 COMPONENT_BUGDB=        x11/libraries
 COMPONENT_ANITYA_ID=	1792
+TPNO=			49156
 
 FIX_PC_FILES=xshmfence.pc.in
 
@@ -50,3 +51,5 @@ COMPONENT_TEST_TRANSFORMS += \
         '-e "/FAIL:/p" ' \
         '-e "/ERROR:/p" '
 COMPONENT_TEST_MASTER = $(COMPONENT_TEST_RESULTS_DIR)/results-all.master
+
+REQUIRED_PACKAGES += x11/header/x11-protocols

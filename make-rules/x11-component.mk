@@ -39,6 +39,24 @@ ifneq ($(strip $(COMPONENT_ARCHIVE_SRC)), none)
 COMPONENT_ARCHIVE_URL ?=	https://www.x.org/releases/individual/$(COMPONENT_CATEGORY)/$(COMPONENT_ARCHIVE)
 endif
 
+# Automatically set COMPONENT_SIG_URL* for all COMPONENT_ARCHIVE_URL*
+# matching www.x.org
+define x11-make-sig-url
+ifneq (,$(findstring www.x.org,$(COMPONENT_ARCHIVE_URL$(1))))
+ifeq "$(origin COMPONENT_SIG_URL$(1))" "undefined"
+COMPONENT_SIG_URL$(1) =		$(strip $$(COMPONENT_ARCHIVE_URL$(1))).sig
+endif
+endif
+endef
+
+$(eval $(call x11-make-sig-url,))
+$(foreach suffix, \
+    $(subst COMPONENT_ARCHIVE_URL_,, \
+	$(filter COMPONENT_ARCHIVE_URL_%, $(.VARIABLES))), \
+    $(eval $(call x11-make-sig-url,_$(suffix))))
+
+
+# Set packages to be part of the X consolidation incorporation
 PKGMOGRIFY_TRANSFORMS += $(WS_TOP)/transforms/X-incorporation
 
 include $(WS_MAKE_RULES)/common.mk
@@ -50,6 +68,7 @@ UTIL_MACROS = $(WS_COMPONENTS)/x11/util/util-macros/build/prototype/$(MACH)
 ACLOCAL_INCLUDES = -I$(UTIL_MACROS)/usr/share/aclocal
 AUTORECONF_ENV = ACLOCAL="/usr/bin/aclocal $(ACLOCAL_INCLUDES)"
 PKG_CONFIG_PATHS += $(UTIL_MACROS)/usr/share/pkgconfig
+REQUIRED_PACKAGES += developer/build/autoconf/xorg-macros
 
 # X.Org packages use a common set of sgml entities to build documentation
 XORG_DOCS = $(WS_COMPONENTS)/x11/doc/build/prototype/$(MACH)
@@ -102,6 +121,9 @@ CONFIGURE_OPTIONS += --with-xorg-module-dir="$(X11_SERVERMODS_DIR)"
 # some drivers are compiled with a different compiler than the server
 CFLAGS.studio += -xldscope=hidden
 CFLAGS.gcc += -fvisibility=hidden
+
+# All drivers need some headers from this package
+REQUIRED_PACKAGES += x11/header/x11-protocols
 
 # Resolve calls to functions in Xorg against the Xorg binary
 XORG_EXTERNS_FLAG ?= -z parent=$(USRBINDIR)/Xorg

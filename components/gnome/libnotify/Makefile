@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS = 64_and_32
@@ -29,6 +29,7 @@ include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		libnotify
 COMPONENT_VERSION=	0.7.7
+COMPONENT_PROJECT_URL=	https://developer.gnome.org/libnotify/
 COMPONENT_ARCHIVE_HASH=	\
 	sha256:9cb4ce315b2655860c524d46b56010874214ec27e854086c1a1d0260137efc04
 COMPONENT_BUGDB=        gnome/libraries
@@ -38,13 +39,6 @@ TPNO=			34499
 
 # Tests do not work on Solaris yet
 TEST_TARGET= $(SKIP_TEST)
-
-# Needs gtk3, not available on S11.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_32_and_64=
-INSTALL_32_and_64=
-PUBLISH_STAMP=
-endif
 
 include $(WS_MAKE_RULES)/gnome-component.mk
 

@@ -42,7 +42,15 @@ COMPONENT_PROJECT_URL=	https://golang.org
 COMPONENT_ANITYA_ID=	1227
 
 ARC_CASE=		PSARC/2015/203,PSARC/2016/250
-TPNO=			39850
+TPNO=			42638
+
+
+# The .1 refers to version 1.7.6-1 to distinguish between community version of
+# golang and this package, which contains other known fixes backported from
+# upstream. A similar approach is adopted by some Linux distros.
+
+IPS_COMPONENT_VERSION=	$(COMPONENT_VERSION).1
+HUMAN_VERSION=		$(COMPONENT_VERSION)-1
 
 # Go has a number of supplementary tools and packages that are located in
 # separate archives or source repositories. Because Go currently forces a
@@ -58,6 +66,8 @@ SUPP_PACKAGES=		crypto image lint net sys text tools tour
 define supp-rules
 COMPONENT_NAME_$(1)=		$(1)
 COMPONENT_VERSION_$(1)=		$(COMPONENT_VERSION)
+IPS_COMPONENT_VERSION_$(1)=	$(COMPONENT_VERSION).1
+HUMAN_VERSION_$(1)=		$(COMPONENT_VERSION)-1
 COMPONENT_LABEL_$(1)=
 COMPONENT_IMPORT_SRC_$(1)=	golang.org/x
 GIT_REPO_$(1)=			https://github.com/golang/$(1).git
@@ -145,15 +155,6 @@ PUBLISH_TRANSFORMS +=	$(WS_TOP)/transforms/locale
 PUBLISH_TRANSFORMS +=	$(PKGMOGRIFY_TRANSFORMS)
 PUBLISH_TRANSFORMS +=	$(WS_TOP)/transforms/incorporate
 PUBLISH_TRANSFORMS +=	$(WS_TOP)/transforms/publish-cleanup
-ifeq ($(BUILD_TYPE),evaluation)
-	PUBLISH_TRANSFORMS += $(WS_TOP)/transforms/evaluation
-endif
-
-$(NO_ELFSIGN_MOG): install
-	cd $(PROTO_DIR); \
-	find . -type f -exec elffile {} + | grep 'ELF [36]' | \
-	    $(GSED) -e 's/^..\(.*\):.*$$/<transform file path=\1$$ -> \\\
-	        default com.oracle.elfsign false>/' > $@
 
 PUBLISH_TRANSFORMS +=	$(NO_ELFSIGN_MOG)
 
@@ -231,8 +232,11 @@ define COMPONENT_INSTALL_ACTION=
 	($(RM) $(NO_ELFSIGN_MOG))
 endef
 
-# clear COMPONENT_POST_INSTALL_ACTION so we can append PERL_SCRIPTS_PROCESS
-# at the end
+# The component makes heavy use of COMPONENT_POST_INSTALL_ACTION. But since
+# there is already processing of PERL_SCRIPTS_PROCESS in that variable which
+# has to happen after our own actions, we have to set
+# COMPONENT_POST_INSTALL_ACTION clean, add our stuff and again attach perl
+# processing again.
 COMPONENT_POST_INSTALL_ACTION =
 
 #
@@ -274,6 +278,13 @@ COMPONENT_POST_INSTALL_ACTION += \
 	$(ENV) $(COMPONENT_INSTALL_ENV) go install \
 		-asmflags -trimpath=$(PROTO_ROOT) -gcflags -trimpath=$(PROTO_ROOT) \
 		"github.com/golang/...");
+
+COMPONENT_POST_INSTALL_ACTION += ( \
+	cd $(PROTO_DIR); \
+	find . -type f -exec elffile {} + | grep 'ELF [36]' | \
+	    $(GSED) -e 's/^..\(.*\):.*$$/<transform file path=\1$$ -> \\\
+	        default com.oracle.elfsign false>/' > $(NO_ELFSIGN_MOG) \
+	);
 
 PERL_SCRIPTS= \
   $(PROTOUSRLIBDIR)/gocode/$(COMPONENT_MAJOR_VERSION)/src/golang.org/x/sys/plan9/mksyscall.pl \

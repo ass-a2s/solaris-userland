@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            32_and_64
@@ -31,11 +31,12 @@ include ../../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		gst-plugins-base
 COMPONENT_VERSION=	1.10.3
-COMPONENT_PROJECT_URL=	http://gstreamer.freedesktop.org/
+COMPONENT_PROJECT_URL=	https://gstreamer.freedesktop.org/
 COMPONENT_ARCHIVE=	$(COMPONENT_SRC).tar.xz
 COMPONENT_ARCHIVE_HASH= \
 	sha256:e6299617d705a0cbfb535107c1d3a8fc0f0967f14193a8c5c7583f46a88b1710
-COMPONENT_ARCHIVE_URL=	http://gstreamer.freedesktop.org/src/$(COMPONENT_NAME)/$(COMPONENT_ARCHIVE)
+COMPONENT_ARCHIVE_URL=	https://gstreamer.freedesktop.org/src/$(COMPONENT_NAME)/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_BUGDB=	gnome/multimedia
 COMPONENT_ANITYA_ID=	1263
 
@@ -48,13 +49,6 @@ PYTHON_VERSIONS= 2.7
 # The results-all.master check passes on jagrafess but fails on slitheen
 # Disabling for now 
 TEST_TARGET= $(SKIP_TEST)
-
-# Needs gobject-introspection, not available on S11.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_32_and_64=
-INSTALL_32_and_64=
-PUBLISH_STAMP=
-endif
 
 include $(WS_MAKE_RULES)/common.mk
 
@@ -100,12 +94,8 @@ COMPONENT_TEST_TRANSFORMS += \
         '-e "/ERROR:/p" '
 
 REQUIRED_PACKAGES += codec/libtheora
-ifeq ($(BUILD_TYPE), evaluation)
-REQUIRED_PACKAGES += codec/ogg-vorbis
-else
 REQUIRED_PACKAGES += codec/libogg
 REQUIRED_PACKAGES += codec/libvorbis
-endif
 REQUIRED_PACKAGES += library/desktop/cairo
 REQUIRED_PACKAGES += library/desktop/gobject/gobject-introspection
 REQUIRED_PACKAGES += library/desktop/gstreamer-1

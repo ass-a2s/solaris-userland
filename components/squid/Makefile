@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2011, 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 BUILD_BITS= 64
 COMPILER= gcc
@@ -35,6 +35,7 @@ COMPONENT_PROJECT_URL=  http://www.squid-cache.org/
 COMPONENT_ARCHIVE=      $(COMPONENT_SRC).tar.xz
 COMPONENT_ARCHIVE_HASH= sha256:5ddb4367f2dc635921f9ca7a59d8b87edb0412fa203d1543393ac3c7f9fef0ec
 COMPONENT_ARCHIVE_URL=  $(COMPONENT_PROJECT_URL)Versions/v3/3.5/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_ANITYA_ID=	4880
 
 # Enable adiheap and adistack security extensions
@@ -43,10 +44,6 @@ ADISTACK_MODE =	$(ADISTACK_ENABLE)
 
 TEST_TARGET= $(TEST_64)
 include $(WS_MAKE_RULES)/common.mk
-
-# Look for gnutls-3 pkg-config & libraries before the defaults
-PKG_CONFIG_PATH.64 := $(PKG_CONFIG_PATH.64)/gnutls-3:$(PKG_CONFIG_PATH.64)
-LDFLAGS += -L$(USRLIBDIR64)/gnutls-3
 
 CFLAGS += -I$(USRINCDIR)/kerberosv5
 CFLAGS += $(CPP_LARGEFILES)
@@ -132,6 +129,7 @@ REQUIRED_PACKAGES += system/core-os
 REQUIRED_PACKAGES += system/library/gcc/gcc-c-runtime
 REQUIRED_PACKAGES += system/library/gcc/gcc-c++-runtime
 REQUIRED_PACKAGES += system/library/math
+REQUIRED_PACKAGES += system/library/pam-core
 REQUIRED_PACKAGES += system/library/security/crypto
 $(SOLARIS_11_3_ONLY)REQUIRED_PACKAGES += system/library/security/gss
 $(SOLARIS_11_3_ONLY)REQUIRED_PACKAGES += system/library/security/libsasl

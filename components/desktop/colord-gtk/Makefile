@@ -18,7 +18,9 @@
 #
 # CDDL HEADER END
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+
+#
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            64_and_32
@@ -29,20 +31,18 @@ include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		colord-gtk
 COMPONENT_VERSION=	0.1.26
-COMPONENT_PROJECT_URL=	http://www.freedesktop.org/software/colord/
+COMPONENT_PROJECT_URL=	https://www.freedesktop.org/software/colord/
 COMPONENT_ARCHIVE=      $(COMPONENT_SRC).tar.xz
 COMPONENT_ARCHIVE_HASH= \
 	sha256:28d00b7f157ea3e2ea5315387b2660fde82faba16674861c50465e55d61a3e45
 COMPONENT_ARCHIVE_URL=	$(COMPONENT_PROJECT_URL)/releases/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_BUGDB=	gnome/libraries
 COMPONENT_ANITYA_ID=	331
 
 TPNO=			25613
 
 TEST_TARGET = $(NO_TESTS)
-
-# Needs gobject-introspection, not available on S11.
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/common.mk
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 # These files must have CDDL
@@ -9,8 +9,22 @@ syntax: glob
 components/**/Makefile
 components/**/llib-l*
 components/**.p5m
+components/**/generate/*.static
+components/**/generate/*.generate
+components/**/generate/common.transform
+components/cyrus-sasl/test/README.test
+components/cyrus-sasl/test/TestSuite.conf
+components/cyrus-sasl/test/cleanup
+components/cyrus-sasl/test/run_testsuite
+components/cyrus-sasl/test/setup-for-mit
+components/cyrus-sasl/test/setup_testsuite
+components/cyrus-sasl/test/transform-results
+components/gnupg/gnupg.p5m.link_gpg_to_gpg2
 components/meta-packages/history/history
 components/meta-packages/incorporation-cache
+components/ntp/Solaris/ntp.sh
+components/ntp/Solaris/ntp.xml
+components/ntp/manpages/ntpd.8
 components/open-fabrics/ofed-component.mk
 components/open-fabrics/ofed.mk
 components/open-fabrics/libsif/libsif-macros.mk
@@ -23,11 +37,13 @@ components/openssh/sources/sftp-audit-solaris.h
 components/openvswitch/files/include/solaris/automake.mk
 components/php/**.conf
 components/php/php.mk
-components/php/php56/enable-extensions.mk
-components/php/php56/php56-metadata.mk
 components/php/php71/enable-extensions.mk
 components/php/php71/php71-metadata.mk
+components/php/php73/enable-extensions.mk
+components/php/php73/php73-metadata.mk
 components/php/phpize.mk
+components/ptp/Solaris/ptp.sh
+components/ptp/Solaris/ptp.xml
 components/sendmail/files/aliases
 components/sendmail/files/aux/Makefile
 components/sendmail/files/aux/mailq.c

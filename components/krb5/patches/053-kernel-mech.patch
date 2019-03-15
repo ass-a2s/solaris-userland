@@ -107,7 +107,7 @@
  /** declarations of internal name mechanism functions **/
 --- a/src/lib/gssapi/krb5/accept_sec_context.c
 +++ b/src/lib/gssapi/krb5/accept_sec_context.c
-@@ -435,6 +435,7 @@ kg_accept_krb5(minor_status, context_handle,
+@@ -437,6 +437,7 @@ kg_accept_krb5(minor_status, context_handle,
      char *sptr;
      OM_uint32 tmp;
      size_t md5len;
@@ -115,7 +115,7 @@
      krb5_gss_cred_id_t cred = 0;
      krb5_data ap_rep, ap_req;
      unsigned int i;
-@@ -701,6 +702,7 @@ kg_accept_krb5(minor_status, context_handle,
+@@ -703,6 +704,7 @@ kg_accept_krb5(minor_status, context_handle,
          gss_flags = GSS_C_REPLAY_FLAG | GSS_C_SEQUENCE_FLAG;
          if (ap_req_options & AP_OPTS_MUTUAL_REQUIRED)
              gss_flags |= GSS_C_MUTUAL_FLAG;
@@ -123,7 +123,7 @@
      } else {
          /* gss krb5 v1 */
  
-@@ -728,14 +730,22 @@ kg_accept_krb5(minor_status, context_handle,
+@@ -730,14 +732,22 @@ kg_accept_krb5(minor_status, context_handle,
          }
  
          ptr = (unsigned char *) authdat->checksum->contents;
@@ -152,7 +152,7 @@
  
          /*
            The following section of code attempts to implement the
-@@ -776,7 +786,7 @@ kg_accept_krb5(minor_status, context_handle,
+@@ -778,7 +788,7 @@ kg_accept_krb5(minor_status, context_handle,
  
          /* Read the token flags.  Remember if GSS_C_DELEG_FLAG was set, but
           * mask it out until we actually read a delegated credential. */
@@ -161,7 +161,7 @@
          token_deleg_flag = (gss_flags & GSS_C_DELEG_FLAG);
          gss_flags &= ~GSS_C_DELEG_FLAG;
  
-@@ -785,8 +795,8 @@ kg_accept_krb5(minor_status, context_handle,
+@@ -787,8 +797,8 @@ kg_accept_krb5(minor_status, context_handle,
          i = authdat->checksum->length - 24;
          if (i && token_deleg_flag) {
              if (i >= 4) {
@@ -172,7 +172,7 @@
                  i -= 4;
  
                  if (i < option.length) {
-@@ -883,6 +893,7 @@ kg_accept_krb5(minor_status, context_handle,
+@@ -885,6 +895,7 @@ kg_accept_krb5(minor_status, context_handle,
                                        GSS_C_DCE_STYLE | GSS_C_IDENTIFY_FLAG |
                                        GSS_C_EXTENDED_ERROR_FLAG)));
      ctx->seed_init = 0;
@@ -192,7 +192,7 @@
      unsigned int terminated : 1;
 --- a/src/lib/gssapi/krb5/gssapi_krb5.c
 +++ b/src/lib/gssapi/krb5/gssapi_krb5.c
-@@ -1050,6 +1050,7 @@ static int gss_krb5mechglue_init(void)
+@@ -1058,6 +1058,7 @@ static int gss_krb5mechglue_init(void)
  
      mech_krb5.mechNameStr = "kerberos_v5";
      mech_krb5.mech_type = (gss_OID)gss_mech_krb5;

@@ -9,10 +9,10 @@
 #
 --- a/src/lib/gssapi/libgssapi_krb5.exports
 +++ b/src/lib/gssapi/libgssapi_krb5.exports
-@@ -37,6 +37,9 @@ GSS_C_MA_CBINDINGS
- GSS_C_MA_PFS
+@@ -39,6 +39,9 @@ GSS_C_MA_PFS
  GSS_C_MA_COMPRESS
  GSS_C_MA_CTX_TRANS
+ GSS_C_SEC_CONTEXT_SASL_SSF
 +gssint_qop_to_num
 +gssint_num_to_qop
 +gssint_get_mech_info

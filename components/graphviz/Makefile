@@ -20,43 +20,42 @@
 #
 
 #
-# Copyright (c) 2011, 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 BUILD_BITS= 64_and_32
 include ../../make-rules/shared-macros.mk
+COMPILER=gcc
 
-COMPONENT_NAME=		graphviz
-COMPONENT_VERSION=	2.28.0
-COMPONENT_PROJECT_URL=	http://www.graphviz.org/
-COMPONENT_ARCHIVE_HASH=	\
-    sha256:d3aa7973c578cae4cc26d9d6498c57ed06680cab9a4e940d0357a3c6527afc76
-COMPONENT_ARCHIVE_URL=	$(COMPONENT_PROJECT_URL)pub/graphviz/stable/SOURCES/$(COMPONENT_ARCHIVE)
-COMPONENT_ANITYA_ID=	1249
+COMPONENT_NAME        = graphviz
+COMPONENT_VERSION     = 2.40.1
+COMPONENT_PROJECT_URL = http://www.graphviz.org/
+COMPONENT_SRC         = $(COMPONENT_NAME)-$(COMPONENT_VERSION)
+COMPONENT_ARCHIVE     = $(COMPONENT_SRC).tar.gz
 
-TPNO=			17707
+COMPONENT_ANITYA_ID   = 1249
+
+GIT_REPO = https://gitlab.com/graphviz/graphviz/
+GIT_TAG  = stable_release_2.40.1
+GIT_COMMIT_ID = 67cd2e51
+GIT_HASH = sha256:f1217dcd5178193c1308ec2e1c44f53a4100bc6cba4ba115d3e2536185757b4e
+
+TPNO = 49299
+
+COMPONENT_PREP_ACTION += \
+	( cd $(@D) ; PATH="$(PATH)" $(CONFIG_SHELL) autogen.sh NOCONFIG)
 
 # publish for only one version of perl
 PERL_VERSIONS = $(PERL_VERSION)
 
-# There are tests, but they fail consistently because the test samples are out
-# of date and not generated with a known configuration.  See
-# http://graphviz.org/bugs/b2063.html
-TEST_TARGET= $(SKIP_TEST)
-
-ifneq ($(BUILD_TYPE), evaluation)
 # We want to build a couple of extra things after the installs are done, so set
 # the install targets appropriately.
 INSTALL_TARGET = $(INSTALL_$(MK_BITS))
 INSTALL_TARGET += $(PROTOUSRLIBDIR)/graphviz/config6
 INSTALL_TARGET += $(PROTO_DIR)/$(PYTHON.2.7.VENDOR_PACKAGES)/gv.pyc
-endif
-
-# Depends on newer cairo, which cannot be updated in S11.
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/common.mk
 
-PATH =		/usr/php/5.6/bin:/usr/bin:/usr/gnu/bin
+PATH =		/usr/php/7.1/bin:/usr/bin:/usr/gnu/bin
 
 # GMP header files for the guile extension (no --with- flag)
 # The guile build is broken with studio (15732452), so we disable this for now.
@@ -65,25 +64,24 @@ PATH =		/usr/php/5.6/bin:/usr/bin:/usr/gnu/bin
 CPPFLAGS +=	-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/solaris
 # PHP header files (no --with- flag)
 CPPFLAGS +=	$(shell PATH=$(PATH) php-config --includes)
-CXX +=		$(studio_NORUNPATH)
-CXX +=		-std=sun03
 
 # Make sure to use the right python, depending on the 32/64-bit build.
 CONFIGURE_ENV +=	PYTHON27=$(PYTHON.2.7)
 CONFIGURE_OPTIONS +=	--without-included-ltdl
+CONFIGURE_OPTIONS +=	--enable-ocaml=no
 CONFIGURE_OPTIONS +=	--enable-python=no
 CONFIGURE_OPTIONS +=	--enable-python27=yes
 CONFIGURE_OPTIONS +=	--x-libraries=$(CONFIGURE_LIBDIR.$(BITS))
+CONFIGURE_OPTIONS +=	--with-gdincludedir=$(USRINCDIR)/gd2
 
 COMPONENT_BUILD_ARGS += 	GREP=$(USRBINDIR)/ggrep
 
-ifneq ($(BUILD_TYPE), evaluation)
 # perl, ruby, php ship 64-bit only.
 $(CONFIGURE_32): CONFIGURE_OPTIONS +=	--enable-perl=no
 $(CONFIGURE_32): CONFIGURE_OPTIONS +=	--enable-ruby=no
 $(CONFIGURE_32): CONFIGURE_OPTIONS +=	--enable-php=no
 $(CONFIGURE_64): CONFIGURE_ENV +=	PERL=$(PERL)
-$(CONFIGURE_64): CONFIGURE_ENV +=	RUBY=$(RUBY.2.1)
+$(CONFIGURE_64): CONFIGURE_ENV +=	RUBY=$(RUBY.2.5)
 $(INSTALL_64): COMPONENT_INSTALL_ARGS += PHP_INSTALL_DIR=$(shell PATH=$(PATH) php-config --extension-dir)
 # tcl ships both 32 and 64 bit, but even though /usr/bin/tclsh is 64-bit, there
 # is no place to stick 64-bit modules, so skip it.  On the other hand, make
@@ -96,7 +94,6 @@ $(INSTALL_32): COMPONENT_INSTALL_ARGS += LUA_INSTALL_DIR=$(USRLIBDIR)/lua/5.2
 $(INSTALL_64): COMPONENT_INSTALL_ARGS += LUA_INSTALL_DIR=$(USRLIBDIR)/lua/5.2/64
 # Use GNU ln, which supports the -r (--relative) option.
 COMPONENT_INSTALL_ARGS += LN_S="gln -s"
-endif
 
 # Create the config file once the 32-bit build is complete.  This runs the bits
 # we just built, so we have to set a handful of variables to the right place.
@@ -118,8 +115,21 @@ PKG_MACROS += PERL_VERSION_NODOT=$(PERL_VERSION_NODOT)
 
 # The test infrastructure doesn't run in a VPATHed environment.
 COMPONENT_PRE_TEST_ACTION = \
-	(cd $(@D)/rtest; ln -s $(SOURCE_DIR)/rtest/* .)
+    (cd $(@D)/rtest; \
+    if ! test -L rtest.sh ; then \
+        ln -s $(SOURCE_DIR)/rtest/* . ; \
+    fi )
+COMPONENT_TEST_DIR = $(@D)/rtest
+COMPONENT_TEST_ENV = PATH=$(BUILD_DIR_$(BITS)):$(GNUBIN):$(PATH)
+ 
+COMPONENT_TEST_MASTER = $(COMPONENT_TEST_RESULTS_DIR)/results-all.master
+COMPONENT_TEST_TRANSFORMS += '-n -e "/No. tests: /p"'
 
+# The tests are known to fail consistently because the test samples are out
+# of date and not generated with a known configuration.
+test: $(TEST_32_and_64)
+
+REQUIRED_PACKAGES += desktop/pdf-viewer/poppler
 REQUIRED_PACKAGES += image/graphviz
 REQUIRED_PACKAGES += image/library/libjpeg
 REQUIRED_PACKAGES += image/library/libpng14
@@ -133,20 +143,24 @@ REQUIRED_PACKAGES += library/expat
 REQUIRED_PACKAGES += library/gd
 REQUIRED_PACKAGES += library/glib2
 REQUIRED_PACKAGES += library/libtool/libltdl
+REQUIRED_PACKAGES += library/poppler
 REQUIRED_PACKAGES += library/zlib
 REQUIRED_PACKAGES += print/filter/ghostscript
 REQUIRED_PACKAGES += print/filter/ghostscript-core
 REQUIRED_PACKAGES += runtime/lua
-REQUIRED_PACKAGES += runtime/ocaml
 REQUIRED_PACKAGES += $(PERL_PKG)
-REQUIRED_PACKAGES += runtime/ruby-21
+REQUIRED_PACKAGES += runtime/python-27
+REQUIRED_PACKAGES += runtime/ruby-25
 REQUIRED_PACKAGES += runtime/tk-8
 REQUIRED_PACKAGES += shell/ksh93
 REQUIRED_PACKAGES += system/library/c++-runtime
 REQUIRED_PACKAGES += system/library/fontconfig
 REQUIRED_PACKAGES += system/library/freetype-2
+REQUIRED_PACKAGES += system/library/gcc/gcc-c-runtime
+REQUIRED_PACKAGES += system/library/gcc/gcc-c++-runtime
 REQUIRED_PACKAGES += system/library/math
-REQUIRED_PACKAGES += web/php-56
+REQUIRED_PACKAGES += web/php-71
+REQUIRED_PACKAGES += x11/library/freeglut
 REQUIRED_PACKAGES += x11/library/libx11
 REQUIRED_PACKAGES += x11/library/libxcursor
 REQUIRED_PACKAGES += x11/library/libxmu

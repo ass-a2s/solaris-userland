@@ -20,17 +20,20 @@
 #
 
 #
-# Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 #
+
 BUILD_BITS= 64_and_32
 include ../../make-rules/shared-macros.mk
 
-COMPONENT_PROJECT_URL= http://www2.research.att.com/sw/download/
+COMPONENT_PROJECT_URL=	http://www.kornshell.com/
 COMPONENT_ANITYA_ID=	1523
 
 # These are required if retrieving packages from the AT&T website.
 ATT_USERNAME= "I accept www.opensource.org/licenses/eclipse"
 ATT_PASSWD= "."
+# Upstream moved to https://github.com/att/ast but doesn't have tarballs
+# available for download from there yet.
 
 COMPONENT_TEST_MASTER = \
 	$(COMPONENT_TEST_RESULTS_DIR)/results-$(BITS).$(MACH).master 
@@ -60,6 +63,7 @@ COMPONENT_ARCHIVE =	$(COMPONENT_SRC).tgz
 COMPONENT_ARCHIVE_HASH = \
     sha256:c40cf57e9b2186271a9c362a560aa4a6e25ba911a8258ab931d2bbdbce44cfe5
 COMPONENT_ARCHIVE_URL = http://www2.research.att.com/~astopen/download/tgz/$(COMPONENT_ARCHIVE)
+COMPONENT_ANITYA_ID_1=	1523
 
 TPNO=		16530
 
@@ -143,18 +147,6 @@ IPS_PKG_NAME= ksh93
 IPS_COMPONENT_VERSION= 93.21.1.20120801
 HUMAN_VERSION= 93u+ 2012-08-01
 
-# Exposes a bug in ON.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_32_and_64=
-INSTALL_32_and_64=
-PUBLISH_STAMP=
-
-COMPONENT_POST_INSTALL_ACTION += \
-	(for binary in msgcvt msgcpp msgget msggen ksh shcomp alias; do \
-		/usr/bin/elfedit -e 'dyn:delete RPATH' -e 'dyn:delete RUNPATH' \
-		    "$(PROTO_DIR)/$(MACH64)/bin/$$binary" ; \
-	done )
-endif
 
 BUILD_STYLE= attpackagemake
 include $(WS_MAKE_RULES)/common.mk

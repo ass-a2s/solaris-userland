@@ -18,7 +18,9 @@
 #
 # CDDL HEADER END
 #
-# Copyright (c) 2016, 2017, Oracle and/or its affiliates. All rights reserved.
+
+#
+# Copyright (c) 2016, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 # parfait is a bit unhappy (24796481)
@@ -46,12 +48,9 @@ TPNO=			27381
 # Test don't work on Solaris
 TEST_TARGET = $(SKIP_TEST)
 
-# Needs gobject-introspection, not available on S11.
-include $(WS_MAKE_RULES)/no-evaluation.mk
-
 include $(WS_MAKE_RULES)/common.mk
 
-# Regenerate configure after patches/02-duktape.patch modifies configure.ac
+# Regenerate configure after applying patches that modify configure.ac
 COMPONENT_PREP_ACTION += ( cd $(@D); autoreconf -fiv);
 # Make sure we haven't broken the SMF manifest formatting
 COMPONENT_PREP_ACTION += \
@@ -77,7 +76,7 @@ CONFIGURE_OPTIONS += --with-os-type=solaris
 CONFIGURE_OPTIONS += --sysconfdir="$(ETCDIR)"
 
 # Workaround the mozjs issue described in 24935318
-LD_EXEC_OPTIONS += -M $(PWD)/../../gnome/gjs/mapfile
+LD_EXEC_OPTIONS += -M $(WS_COMPONENTS)/gnome/gjs/mapfile
 ADIHEAP_MODE = $(ADIHEAP_DISABLE)
 ADISTACK_MODE = $(ADISTACK_DISABLE)
 
@@ -99,9 +98,10 @@ PKG_PROTO_DIRS += $(COMPONENT_DIR)/files
 REQUIRED_PACKAGES += library/desktop/gobject/gobject-introspection
 REQUIRED_PACKAGES += library/expat
 REQUIRED_PACKAGES += library/glib2
-REQUIRED_PACKAGES += library/libmozjs-24
+REQUIRED_PACKAGES += library/libmozjs-38
 REQUIRED_PACKAGES += system/core-os
 REQUIRED_PACKAGES += system/library/dbus
 REQUIRED_PACKAGES += system/library/gcc/gcc-c-runtime
 REQUIRED_PACKAGES += system/library/gcc/gcc-c++-runtime
 REQUIRED_PACKAGES += system/library/math
+REQUIRED_PACKAGES += system/library/pam-core

@@ -18,7 +18,9 @@
 #
 # CDDL HEADER END
 #
-# Copyright (c) 2016, 2017, Oracle and/or its affiliates. All rights reserved.
+
+#
+# Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            64_and_32
@@ -27,22 +29,16 @@ include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		telepathy-logger
 COMPONENT_VERSION=	0.8.2
-COMPONENT_PROJECT_URL=	http://telepathy.freedesktop.org
+COMPONENT_PROJECT_URL=	https://telepathy.freedesktop.org
 COMPONENT_ARCHIVE=	$(COMPONENT_SRC).tar.bz2
 COMPONENT_ARCHIVE_HASH= \
 	sha256:8fcad534d653b1b365132c5b158adae947810ffbae9843f72dd1797966415dae
 COMPONENT_ARCHIVE_URL=	$(COMPONENT_PROJECT_URL)/releases/$(COMPONENT_NAME)/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_BUGDB=	gnome/libraries
 COMPONENT_ANITYA_ID=	6067
 
 TPNO=			25836
-
-# Needs telepathy-glib, not available on S11.
-ifeq ($(BUILD_TYPE), evaluation)
-BUILD_32_and_64=
-INSTALL_32_and_64=
-PUBLISH_STAMP=
-endif
 
 # Not compiled as an xpg6 application, but configure defines this, so we
 # override and undefine it to avoid feature_tests.h failures; unclear what the

@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2016, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 # This variable has no impact on perl build, it is here merely to satisfy
@@ -32,40 +32,29 @@ BUILD_BITS = 64
 include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		DBD-mysql
-COMPONENT_VERSION=	4.042
-IPS_COMPONENT_VERSION=  4042
+COMPONENT_VERSION=	4.048
+IPS_COMPONENT_VERSION=  4048
 HUMAN_VERSION=		$(COMPONENT_VERSION)
 COMPONENT_ARCHIVE_HASH=	\
-	sha256:dadb6884788dc3fdf40b13b72d8c60d5a83680cc2aeec7515c3e5999e064b455
+	sha256:1737ffcae68712c04bf529f098df53534ca9a60eb3ce0ad23700bfc40c6415ff
 COMPONENT_ARCHIVE_URL=	http://search.cpan.org/CPAN/authors/id/M/MI/MICHIELB/$(COMPONENT_ARCHIVE)
 COMPONENT_PROJECT_URL=	https://github.com/perl5-dbi/DBD-mysql
 COMPONENT_BUGDB=	perl-mod/dbd-mysql
 COMPONENT_ANITYA_ID=	2807
 
-TPNO=			32689
+TPNO=			46641
 
 
-# MySQL 5.7 is not available in S11.
-ifeq ($(BUILD_TYPE), evaluation)
-PUBLISH_STAMP=
-else
 BUILD_STYLE= makemaker
 LICENSE=DBD-mysql.license
 BUILD_TARGET= $(BUILD_$(MK_BITS)) $(LICENSE)
 include $(WS_MAKE_RULES)/common.mk
-endif
 
 CLEAN_PATHS += $(LICENSE)
 
 COMPONENT_TEST_TARGETS = test
 COMPONENT_TEST_MASTER = $(COMPONENT_TEST_RESULTS_DIR)/results-all.master
-COMPONENT_TEST_TRANSFORMS += \
-	'-e "s/[0-9][0-9]* wallclock secs (.*CPU)$$/<TIMINGS REMOVED>/" ' \
-	'-e "s/^\(\# mysql_[a-z][a-z]* is: \).*/\1<REMOVED>/" ' \
-	'-e "s/^\(\# SQL_DBMS_VER is \).*/\1<REMOVED>/" ' \
-	'-e "s/^\(\# Driver version is \).*/\1<REMOVED>/" ' \
-	'-e "/chmod 644 \"mysql.bs\"/d"' \
-	'-e "/Running Mkbootstrap/d"'
+COMPONENT_TEST_TRANSFORMS += '-n -e "/^Result:/p"'
 
 ASLR_MODE = $(ASLR_NOT_APPLICABLE)
 
@@ -81,11 +70,6 @@ CONFIGURE_OPTIONS += --mysql_config="$(MYSQL_BINDIR)/mysql_config"
 CONFIGURE_OPTIONS += --testuser=$(MYSQL_TEST_USER)
 CONFIGURE_OPTIONS += --testpassword=$(MYSQL_TEST_PASSWORD)
 CONFIGURE_OPTIONS += --testsocket=CHANGEME
-
-# !!!!!!!!! workaround for 22552923
-MYSQL_LIBS          = $(shell $(MYSQL_BINDIR)/mysql_config --libs)
-CONFIGURE_OPTIONS += --libs="$(MYSQL_LIBS) -lCrun"
-# !!!!!!!!! workaround for 22552923
 
 # For the testing we need to run mysql database first. The database needs it's
 # directory, which will be $(MYSQL_TEST_DATADIR). The directory will also

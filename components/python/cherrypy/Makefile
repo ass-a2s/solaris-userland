@@ -20,24 +20,24 @@
 #
 
 #
-# Copyright (c) 2011, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 include ../../../make-rules/shared-macros.mk
 
 PATH=/usr/bin:/usr/gnu/bin:/usr/sbin
 
 COMPONENT_NAME=		CherryPy
-COMPONENT_VERSION=	5.1.0
+COMPONENT_VERSION=	15.0.0
 COMPONENT_PROJECT_URL=	http://www.cherrypy.org/
 COMPONENT_SRC=		$(COMPONENT_NAME)-$(COMPONENT_VERSION)
 COMPONENT_ARCHIVE=	$(COMPONENT_SRC).tar.gz
 COMPONENT_ARCHIVE_HASH=	\
-    sha256:5fccc9ad3bf9a1df83bbb934772f34f42571421bdd75f90f74c170b6c0ef13b1
+    sha256:7404638da9cf8c6be672505168ccb63e16d33cb3aa16a02ec30a44641f7546af
 COMPONENT_ARCHIVE_URL=	$(call pypi_url)
 COMPONENT_BUGDB=	python-mod/cherrypy
 COMPONENT_ANITYA_ID=	3799
 
-TPNO=			27797
+TPNO=			43435
 
 PATCH_LEVEL=0
 
@@ -50,14 +50,15 @@ COMPONENT_POST_INSTALL_ACTION = \
 
 ASLR_MODE = $(ASLR_NOT_APPLICABLE)
 
-COMPONENT_TEST_DIR = 	$(SOURCE_DIR)/cherrypy/test
-COMPONENT_TEST_CMD =	nosetests -s ./
+COMPONENT_TEST_DIR = 	$(SOURCE_DIR)
+COMPONENT_TEST_CMD =	py.test-$(PYTHON_VERSION)
 COMPONENT_TEST_ARGS = 
-COMPONENT_TEST_MASTER = $(COMPONENT_TEST_RESULTS_DIR)/results-all.master
-
 COMPONENT_TEST_TRANSFORMS += \
-	'-e "/^cherrypy./d" ' \
-	'-e "s|\(^Ran [0-9]\+ tests in\).*|\1|" '
+   '-e "s/\(in \).*\(seconds\).*/\1 x \2/"' \
+   '-e "/^platform/d"' \
+   '-e "/^SKIP/d"' \
+   '-e "s/\(tmp\).*/\1\/XXX/"' \
+   '-e "s/=*//"'
 
 # common targets
 build:		$(BUILD_NO_ARCH)
@@ -72,3 +73,6 @@ test:		$(TEST_NO_ARCH)
 system-test:    $(SYSTEM_TESTS_NOT_IMPLEMENTED)
 
 REQUIRED_PACKAGES += system/core-os
+REQUIRED_PACKAGES += library/python/six 
+REQUIRED_PACKAGES += library/python/cheroot 
+REQUIRED_PACKAGES += library/python/portend 

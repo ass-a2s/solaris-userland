@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            64_and_32
@@ -31,7 +31,7 @@ include ../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		gnome-desktop
 COMPONENT_VERSION=	3.24.0
-COMPONENT_PROJECT_URL= 	http://wiki.gnome.org
+COMPONENT_PROJECT_URL= 	https://developer.gnome.org/gnome-desktop/
 COMPONENT_ARCHIVE_HASH=	\
 	sha256:86387aa12ba789afc0772d49fdfbab2d815669552e895be089252dd42aa68677
 COMPONENT_BUGDB=	gnome/libraries
@@ -40,9 +40,6 @@ COMPONENT_ANITYA_ID=	13127
 TPNO=			34530
 
 TEST_TARGET = $(NO_TESTS)
-
-# Needed for Gnome 3, not available on S11.3
-include $(WS_MAKE_RULES)/no-evaluation.mk
 
 include $(WS_MAKE_RULES)/gnome-component.mk
 

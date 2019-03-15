@@ -20,19 +20,19 @@
 #
 
 #
-# Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2018, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 
 BUILD_BITS =            64_and_32
 include ../../../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		libdmx
-COMPONENT_VERSION=	1.1.3
+COMPONENT_VERSION=	1.1.4
 COMPONENT_ARCHIVE_HASH= \
-	sha256:c97da36d2e56a2d7b6e4f896241785acc95e97eb9557465fd66ba2a155a7b201
+	sha256:253f90005d134fa7a209fbcbc5a3024335367c930adf0f3203e754cf32747243
 COMPONENT_BUGDB=        x11/libraries
 COMPONENT_ANITYA_ID=	1594
-TPNO=			14484
+TPNO=			49184
 
 TEST_TARGET = $(NO_TESTS)
 
@@ -42,5 +42,6 @@ include $(WS_MAKE_RULES)/x11-component.mk
 
 CONFIGURE_ENV += LIB_MAN_SUFFIX=3dmx
 
+REQUIRED_PACKAGES += x11/header/x11-protocols
 REQUIRED_PACKAGES += x11/library/libx11
 REQUIRED_PACKAGES += x11/library/libxext

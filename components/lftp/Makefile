@@ -20,30 +20,27 @@
 #
 
 #
-# Copyright (c) 2011, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2018, Oracle and/or its affiliates. All rights reserved.
 #
 BUILD_BITS= 64
 COMPILER= gcc
 include ../../make-rules/shared-macros.mk
 
 COMPONENT_NAME=		lftp
-COMPONENT_VERSION=	4.7.7
-COMPONENT_PROJECT_URL=	http://lftp.yar.ru/
+COMPONENT_VERSION=	4.8.4
+COMPONENT_PROJECT_URL=	https://lftp.yar.ru/
 COMPONENT_ARCHIVE_HASH=	\
-    sha256:7bce216050094a1146ed05bed8fe5b3518224764ffe98884a848d44dc76fff8f
+    sha256:19f3a4236558fbdb88eec01bc9d693c51b122d23487b6bedad4cc67ae6825fc2
 COMPONENT_ARCHIVE_URL=	$(COMPONENT_PROJECT_URL)ftp/$(COMPONENT_ARCHIVE)
+COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_ANITYA_ID=	1555
 
-TPNO=			35984
+TPNO=			47265
 
 TEST_TARGET= $(NO_TESTS)
 include $(WS_MAKE_RULES)/common.mk
 
 PATCH_LEVEL =   0
-
-# Look for gnutls-3 pkg-config & libraries before the defaults
-PKG_CONFIG_PATH.64 := $(PKG_CONFIG_PATH.64)/gnutls-3:$(PKG_CONFIG_PATH.64)
-LDFLAGS += -L$(USRLIBDIR64)/gnutls-3
 
 CONFIGURE_OPTIONS  +=		--localedir=$(CONFIGURE_LOCALEDIR)
 
