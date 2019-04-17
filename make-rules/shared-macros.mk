@@ -242,6 +242,9 @@ PYTHON2_VERSIONS =	2.7
 PYTHON3_VERSIONS =	3.4 3.5
 PYTHON_VERSIONS =	$(PYTHON3_VERSIONS) $(PYTHON2_VERSIONS)
 
+# Temporary variable for python 3.7 ready components
+PYTHON3.7_READY = $(PYTHON3_VERSIONS) 3.7 $(PYTHON2_VERSIONS)
+
 # PYTHON3_SOABI variable defines the naming scheme
 # of python3 extension libraries: cpython or abi3.
 # Currently, most of the components use cpython naming scheme by default,
@@ -379,6 +382,61 @@ BUILD_32_and_64 =	$(BUILD_32) $(BUILD_64)
 $(BUILD_DIR_NO_ARCH)/.built:	BITS=32
 $(BUILD_DIR_32)/.built:		BITS=32
 $(BUILD_DIR_64)/.built:		BITS=64
+
+# COMPONENT_MAKE_JOBS contains the maximal number of build
+# jobs per component. The default value is equal to the
+# number of physical cores. The maximal system load is
+# limited by the number of virtual processors.
+ifneq ($(wildcard /usr/sbin/psrinfo),)
+
+PSRINFO=/usr/sbin/psrinfo
+COMPONENT_MAKE_JOBS ?= $(shell $(PSRINFO) -t | grep -c core)
+SYSTEM_MAX_LOAD := $(shell $(PSRINFO) | wc -l)
+
+# If the number of physical cores cannot be determined from
+# 'psrinfo -t' output, we use the number of virtual processors
+# (hardware threads) as a workaround.
+ifeq ($(COMPONENT_MAKE_JOBS),0)
+COMPONENT_MAKE_JOBS := $(SYSTEM_MAX_LOAD)
+endif
+
+endif
+
+# If the memory is almost exhausted, then refuse to execute parallel build jobs.
+ifneq ($(wildcard /usr/bin/kstat2),)
+ifneq ($(wildcard /usr/bin/pagesize),)
+ifneq ($(wildcard /usr/bin/vmstat),)
+
+KSTAT2 := /usr/bin/kstat2
+VMSTAT := /usr/bin/vmstat
+PAGE_SIZE := $(shell /usr/bin/pagesize)
+
+TOTAL_MEMORY_PAGES := $(shell $(KSTAT2) -p kstat:/vm/usage/memory:mem_total | cut -f 2)
+FREE_MEMORY_PAGES := $(shell $(VMSTAT) | sed  -e '$$!d' | awk '{print 1024*$$5/$(PAGE_SIZE)}')
+ZFS_MEMORY_PAGES := $(shell $(KSTAT2) -p kstat:/vm/usage/memory:mem_zfs | cut -f 2)
+AVAILABLE_MEMORY_PAGES := $(shell echo $$(($(FREE_MEMORY_PAGES)+$(ZFS_MEMORY_PAGES))))
+AVAILABLE_MEMORY_PERCENTAGE := $(shell echo $$((100*$(AVAILABLE_MEMORY_PAGES)/$(TOTAL_MEMORY_PAGES))))
+
+# If there is less than 20 % of available memory, then we set COMPONENT_MAKE_JOBS to 1.
+ifeq ($(shell expr $(AVAILABLE_MEMORY_PERCENTAGE) \<= 20),1)
+COMPONENT_MAKE_JOBS := 1
+endif
+
+endif
+endif
+endif
+
+# If the number of jobs is greater than 1, then we need to set
+# GNU make parameters. If GMAKE variable is used for other
+# command (e.g., build.sh), COMPONENT_MAKE_JOBS must be empty or set to 1.
+ifneq ($(filter-out 1,$(COMPONENT_MAKE_JOBS)),)
+
+ifeq ($(SYSTEM_MAX_LOAD),)
+SYSTEM_MAX_LOAD := $(COMPONENT_MAKE_JOBS)
+endif
+
+COMPONENT_BUILD_ARGS += -j $(COMPONENT_MAKE_JOBS) -l $(SYSTEM_MAX_LOAD)
+endif
 
 INSTALL_NO_ARCH =	$(BUILD_DIR_NO_ARCH)/.installed
 INSTALL_32 =		$(BUILD_DIR_32)/.installed
@@ -640,6 +698,9 @@ PYTHON.3.4.VENDOR_PACKAGES = $(PYTHON.3.4.VENDOR_PACKAGES.$(BITS))
 PYTHON.3.5.VENDOR_PACKAGES.64 = /usr/lib/python3.5/vendor-packages
 PYTHON.3.5.VENDOR_PACKAGES = $(PYTHON.3.5.VENDOR_PACKAGES.$(BITS))
 
+PYTHON.3.7.VENDOR_PACKAGES.64 = /usr/lib/python3.7/vendor-packages
+PYTHON.3.7.VENDOR_PACKAGES = $(PYTHON.3.7.VENDOR_PACKAGES.$(BITS))
+
 PYTHON_VENDOR_PACKAGES.32 = /usr/lib/python$(PYTHON_VERSION)/vendor-packages
 PYTHON_VENDOR_PACKAGES.64 = /usr/lib/python$(PYTHON_VERSION)/vendor-packages/64
 PYTHON_VENDOR_PACKAGES = $(PYTHON_VENDOR_PACKAGES.$(BITS))
@@ -647,6 +708,7 @@ PYTHON_VENDOR_PACKAGES = $(PYTHON_VENDOR_PACKAGES.$(BITS))
 PYTHON.2.7.TEST = /usr/lib/python2.7/test
 PYTHON.3.4.TEST = /usr/lib/python3.4/test
 PYTHON.3.5.TEST = /usr/lib/python3.5/test
+PYTHON.3.7.TEST = /usr/lib/python3.7/test
 
 USRBIN.32 =	/usr/bin
 USRBIN.64 =	/usr/bin/$(MACH64)

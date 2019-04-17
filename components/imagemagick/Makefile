@@ -20,7 +20,7 @@
 #
 
 #
-# Copyright (c) 2011, 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2019, Oracle and/or its affiliates. All rights reserved.
 #
 BUILD_BITS= 64_and_32
 COMPILER=gcc
@@ -29,19 +29,19 @@ include ../../make-rules/shared-macros.mk
 COMPONENT_NAME=			ImageMagick
 COMPONENT_VERSION=		6.9.10
 COMPONENT_MAJOR_VERSION=	$(shell echo $(COMPONENT_VERSION) | $(GSED) -e 's/\([0-9]\+\)\.[0-9]\+\.[0-9]\+/\1/')
-COMPONENT_SUBVERSION=		14
+COMPONENT_SUBVERSION=		34
 HUMAN_VERSION=			$(COMPONENT_VERSION)-$(COMPONENT_SUBVERSION)
 COMPONENT_PROJECT_URL=		https://www.imagemagick.org/
 COMPONENT_SRC=			$(COMPONENT_NAME)-$(COMPONENT_VERSION)-$(COMPONENT_SUBVERSION)
 COMPONENT_ARCHIVE=		$(COMPONENT_SRC).tar.gz
 COMPONENT_ARCHIVE_HASH=	\
-	sha256:96a7a049553b2e12813ecec0d70c9f3232c11cb7b8e892fa176553acfb47b2f3
+	sha256:2763bda2edab9144cc53bce6e417910bfa3d5760cf27686f570938f0909c06ae
 COMPONENT_ARCHIVE_URL=	$(COMPONENT_PROJECT_URL)/download/$(COMPONENT_ARCHIVE)
 COMPONENT_SIG_URL=	$(COMPONENT_ARCHIVE_URL).asc
 COMPONENT_BUGDB=	utility/imagemagick
 COMPONENT_ANITYA_ID=	1372
 
-TPNO=			47270
+TPNO=			50135
 
 # Enable adiheap security extension.
 # adistack fails with libgcc exception unwinding code.
@@ -91,6 +91,7 @@ CONFIGURE_OPTIONS+= --enable-shared
 CONFIGURE_OPTIONS+= --disable-static
 CONFIGURE_OPTIONS+= --without-gvc
 CONFIGURE_OPTIONS+= --disable-openmp
+CONFIGURE_OPTIONS+= --without-openexr
 CONFIGURE_OPTIONS+= --without-openjp2 # tests do not pass
 # Using option 'with-fontconfig=no' so that the fonts/fonts path specified in
 # configuration file 'type-ghostscript.xml' is being used.
@@ -139,7 +140,6 @@ REQUIRED_PACKAGES += library/glib2
 REQUIRED_PACKAGES += library/lcms2
 REQUIRED_PACKAGES += library/libtool/libltdl
 REQUIRED_PACKAGES += library/libxml2
-REQUIRED_PACKAGES += library/openexr
 REQUIRED_PACKAGES += library/zlib
 REQUIRED_PACKAGES += print/filter/ghostscript/fonts/gnu-gs-fonts-std
 REQUIRED_PACKAGES += shell/ksh93
